@@ -118,10 +118,11 @@ CREATE TABLE Transaction (
     discountID varchar(10) NOT NULL,
     custName varchar(30) NOT NULL,
     orderID varchar(10) NOT NULL,
+    transactionPrice float(2),
     PRIMARY KEY(transactionID),
     FOREIGN KEY (discountID) references Discount(discountID),
     FOREIGN KEY (custName) references Customer(custName),
-    FOREIGN KEY (orderID) references Order(orderID)
+    FOREIGN KEY (orderID) references `Order`(orderID)
 );
 
 CREATE TABLE Includedin (

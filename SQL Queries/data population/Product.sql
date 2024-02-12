@@ -53,4 +53,4 @@ INSERT INTO Product (productID, title, content, category, price, availableUnits,
 VALUES ('P019', 'Artisan Craft', 'Handcrafted and artisanal creation', 'Fashion', 64.99, 70, 2, 'lrsAp');
 
 INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
-VALUES ('P020', 'Home Comfort', 'Comfortable and stylish home item', 'Home Decor', 74.99, 70, 2, 'athv');
+VALUES ('P020', 'Home Comfort', 'Comfortable and stylish home item', 'Home Decor', 74.99, 70, 2, 'athvf');

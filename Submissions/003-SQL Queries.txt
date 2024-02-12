@@ -1,0 +1,505 @@
+create database DesInk;
+use DesInk;
+
+CREATE TABLE Designer (
+    desName varchar(30) NOT NULL,
+    email varchar(50) NOT NULL,
+    password varchar(10) NOT NULL,
+    firstName varchar(20) NOT NULL,
+    lastName varchar(20) NOT NULL,
+    fullName varchar(40) generated always as (concat(firstName,' ',lastName)) stored,
+    portfolioID varchar(10),
+    PRIMARY KEY (desName),
+    UNIQUE (email)
+);
+
+CREATE TABLE Portfolio(
+    portfolioID varchar(10) NOT NULL,
+    likes bigint unsigned NOT NULL DEFAULT 0,
+    preOrders int unsigned NOT NULL DEFAULT 0,
+    desName varchar(30),
+    PRIMARY KEY (portfolioID),
+    FOREIGN KEY (desName)
+        REFERENCES Designer(desName)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+ALTER TABLE Designer
+ADD CONSTRAINT Fk_Designer_portfolioID
+FOREIGN KEY(portfolioID) 
+REFERENCES Portfolio(portfolioID)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+CREATE TABLE Product (
+    productID varchar(10) NOT NULL,
+    title varchar(30) NOT NULL,
+    content varchar(50),
+    category varchar(15) NOT NULL,
+    price float(2) NOT NULL,
+    availableUnits int unsigned NOT NULL,
+    maxUnitsCap int unsigned NOT NULL,
+    portfolioID varchar(10) NOT NULL,
+    PRIMARY KEY (productID),
+    FOREIGN KEY (portfolioID)
+    REFERENCES Portfolio(portfolioID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE Customer(
+    custName varchar(30) NOT NULL,
+    email varchar(50) NOT NULL,
+    password varchar(10) NOT NULL,
+    firstName varchar(20) NOT NULL,
+    lastName varchar(20) NOT NULL,
+    fullName varchar(40) generated always as (concat(firstName,' ',lastName)) stored,
+    PRIMARY KEY (custName),
+    UNIQUE (email)
+);
+
+CREATE TABLE Cart(
+    cartID varchar(10) NOT NULL,
+    custName varchar(30) NOT NULL,
+    totalPrice float(2) DEFAULT 0,
+    PRIMARY KEY (cartID),
+    FOREIGN KEY (custName)
+    REFERENCES customer(custName)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE 
+);
+
+CREATE TABLE Address(
+    addressID varchar(10) NOT NULL,
+    houseNo varchar(5) NOT NULL,
+    street varchar(30) NOT NULL,
+    city varchar(30) NOT NULL,
+    state varchar(30) NOT NULL,
+    pincode varchar(7) NOT NULL,
+    PRIMARY KEY (addressID)
+);
+
+CREATE TABLE Discount (
+  discountID varchar(10) NOT NULL,
+  discountCode varchar(10) NOT NULL,
+  discountPercent int NOT NULL,
+  expirationDate date,
+  PRIMARY KEY (discountID)
+);
+
+CREATE TABLE `Order` (
+    orderID varchar(10) NOT NULL,
+    orderDate date NOT NULL,
+    delStatus varchar(15) NOT NULL,
+    custName varchar(30) NOT NULL,
+    addressID varchar(10) NOT NULL,
+    cartID varchar(10) NOT NULL,
+    discountID varchar(10),
+    PRIMARY KEY (orderID),
+    FOREIGN KEY (custName) REFERENCES customer(custName),
+    FOREIGN KEY (addressID) REFERENCES Address(addressID),
+    FOREIGN KEY (cartID) REFERENCES Cart(cartID),
+    FOREIGN KEY (discountID) REFERENCES Discount(discountID)
+);
+
+CREATE TABLE CartItem (
+    cartItemID varchar(10) NOT NULL,
+    cartID varchar(10) NOT NULL,
+    price float(2) NOT NULL,
+    quantity int NOT NULL,
+    dateAdded date NOT NULL,
+    PRIMARY KEY (cartItemID,cartID),
+    FOREIGN KEY (cartID) references Cart(cartID)
+);
+
+CREATE TABLE Transaction (
+    transactionID varchar(10) NOT NULL,
+    discountID varchar(10) NOT NULL,
+    custName varchar(30) NOT NULL,
+    orderID varchar(10) NOT NULL,
+    transactionPrice float(2),
+    PRIMARY KEY(transactionID),
+    FOREIGN KEY (discountID) references Discount(discountID),
+    FOREIGN KEY (custName) references Customer(custName),
+    FOREIGN KEY (orderID) references `Order`(orderID)
+);
+
+CREATE TABLE Includedin (
+  cartID varchar(10) NOT NULL,
+  productID varchar(10) NOT NULL,
+  FOREIGN KEY (cartID) references Cart(cartID),
+  FOREIGN KEY (productID) references Product(productID)
+);
+
+CREATE TABLE Likes (
+  custName varchar(30) NOT NULL,
+  productID varchar(10) NOT NULL,
+  FOREIGN KEY (custName) references Customer(custName),
+  FOREIGN KEY (productID) references Product(productID)
+);
+
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('magnam', 'Subhasini.Guha@yahoo.co.in', '2b602ad0', 'Subhasini', 'Guha');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('soluta', 'Manjusha.Abbott82@hotmail.com', '-62f628b0', 'Manjusha', 'Abbott');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('quibusdam', 'Laxmi_Bhat@gmail.com', '58ca32b7', 'Laxmi', 'Bhat');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('provident', 'Bodhan68@gmail.com', '6cc0d444', 'Bodhan', 'Sinha');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('ducimus', 'Daevika.Khatri46@yahoo.co.in', '-2a801291', 'Daevika', 'Khatri');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('omnis', 'Bishnu91@hotmail.com', '4df1ec2d', 'Bishnu', 'Adiga');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('quaerat', 'Gurdev_Dwivedi@gmail.com', '-53b7bf9b', 'Gurdev', 'Dwivedi');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('rerum', 'Gati41@yahoo.co.in', '2829949f', 'Gati', 'Pandey');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('assumenda', 'Divjot.Bharadwaj@gmail.com', '3f73cd3d', 'Divjot', 'Bharadwaj');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('animi', 'Mohan1@gmail.com', '69ef13ce', 'Mohan', 'Sinha');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('fugit', 'Kamlesh_Panicker@hotmail.com', '2cae3f8d', 'Kamlesh', 'Panicker');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('nihil', 'Purushottam_Joshi@yahoo.co.in', '-74c6756a', 'Purushottam', 'Joshi');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('ullam', 'Sharda.Chopra61@gmail.com', '-200cca4b', 'Sharda', 'Chopra');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('sunt', 'Naveen.Chaturvedi53@gmail.com', '-afa547', 'Naveen', 'Chaturvedi');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('quas', 'Dev77@yahoo.co.in', '7473a905', 'Dev', 'Pillai');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('cumque', 'Avani_Johar@yahoo.co.in', '-71dbc89f', 'Avani', 'Johar');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('minima', 'Gautami70@yahoo.co.in', '-45c25007', 'Gautami', 'Kakkar');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('impedit', 'Divya15@gmail.com', '-30b45dbc', 'Divya', 'Iyengar');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('error', 'Vasudeva59@gmail.com', '5afe560f', 'Vasudeva', 'Sinha');  
+Insert Into Designer (desName, email, password, firstname, lastname) Values ('cum', 'Chandrani30@hotmail.com', '1a8cb536', 'Chandrani', 'Chattopadhyay');  
+
+
+
+Insert Into Portfolio (portfolioID,desName) Values ('Xfepz','magnam');  
+Insert Into Portfolio (portfolioID, desName) Values ('aNPmG','soluta');  
+Insert Into Portfolio (portfolioID, desName) Values ('JOrWa','quibusdam');  
+Insert Into Portfolio (portfolioID, desName) Values ('hbbzK','provident');  
+Insert Into Portfolio (portfolioID, desName) Values ('fLwqV','ducimus');  
+Insert Into Portfolio (portfolioID, desName) Values ('zRhTW','omnis');  
+Insert Into Portfolio (portfolioID, desName) Values ('kSMVb','quaerat');  
+Insert Into Portfolio (portfolioID, desName) Values ('mmSnz','rerum');  
+Insert Into Portfolio (portfolioID, desName) Values ('AqlOX','assumenda');  
+Insert Into Portfolio (portfolioID, desName) Values ('MKZOu','animi');  
+Insert Into Portfolio (portfolioID, desName) Values ('EcBOS','fugit');  
+Insert Into Portfolio (portfolioID, desName) Values ('cPZbP','nihil');  
+Insert Into Portfolio (portfolioID, desName) Values ('athvf','ullam');  
+Insert Into Portfolio (portfolioID, desName) Values ('lrsAp','sunt');  
+Insert Into Portfolio (portfolioID, desName) Values ('khOpW','quas');  
+Insert Into Portfolio (portfolioID, desName) Values ('tmVxq','cumque');  
+Insert Into Portfolio (portfolioID, desName) Values ('OVxDc','minima');  
+Insert Into Portfolio (portfolioID, desName) Values ('AUuyD','impedit');  
+Insert Into Portfolio (portfolioID, desName) Values ('YaBPi','error');  
+Insert Into Portfolio (portfolioID, desName) Values ('sBOQd','cum');  
+
+
+
+--- Updating portfolioID in Designer
+UPDATE Designer
+    SET portfolioID = (
+    SELECT portfolioID FROM portfolio
+    where designer.desName = portfolio.desName
+);
+
+
+
+
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('eum', 'Pramila92@yahoo.co.in', '-48d34faf', 'Pramila', 'Dutta');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('ullam', 'Bhuvaneshwar_Marar89@hotmail.com', '-6e179d27', 'Bhuvaneshwar', 'Marar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('atque', 'Sloka.Kakkar@hotmail.com', '-72685dc5', 'Sloka', 'Kakkar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('commodi', 'Gopi.Marar@yahoo.co.in', '63fd15f9', 'Gopi', 'Marar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('id', 'Agrata_Suthar68@gmail.com', '67ec894c', 'Agrata', 'Suthar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('occaecati', 'Pushti.Deshpande@hotmail.com', '-2f51ff26', 'Pushti', 'Deshpande');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('esse', 'Kumari77@hotmail.com', '-5a1e7fbd', 'Kumari', 'Nair');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('suscipit', 'Darshan_Tagore46@yahoo.co.in', '-18001cda', 'Darshan', 'Tagore');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('facere', 'Vrinda86@gmail.com', '-14bdfdf', 'Vrinda', 'Trivedi');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('laudantium', 'Brajesh_Jha@gmail.com', '-6982e3b3', 'Brajesh', 'Jha');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('natus', 'Amaresh.Pandey@hotmail.com', '-5333bc24', 'Amaresh', 'Pandey');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('veniam', 'Ekaksh_Asan@yahoo.co.in', '5fbbf987', 'Ekaksh', 'Asan');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('quo', 'Chanda86@yahoo.co.in', '-293bba0f', 'Chanda', 'Bandopadhyay');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('placeat', 'Divya.Acharya13@hotmail.com', '-6d7bbe2c', 'Divya', 'Acharya');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('odit', 'Kumari.Deshpande@gmail.com', '-401c2dec', 'Kumari', 'Deshpande');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('eveniet', 'Jyotsana44@yahoo.co.in', '6c2f5af9', 'Jyotsana', 'Bhattathiri');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('voluptates', 'Amodini.Saini@yahoo.co.in', '-88e0a74', 'Amodini', 'Saini');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('architecto', 'Aayushmaan_Chaturvedi42@yahoo.co.in', '6c2f0b92', 'Aayushmaan', 'Chaturvedi');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('numquam', 'Suryakant59@hotmail.com', '620e2e25', 'Suryakant', 'Talwar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('qui', 'Meenakshi.Kocchar5@yahoo.co.in', '4cccfc00', 'Meenakshi', 'Kocchar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('aut', 'Hiranmay56@gmail.com', '6e8022d5', 'Hiranmay', 'Deshpande');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('dolores', 'Menka71@hotmail.com', '-43d2640', 'Menka', 'Varma');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('quisquam', 'Chandra_Ahuja@yahoo.co.in', '97a88ad', 'Chandra', 'Ahuja');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('nobis', 'Aslesha.Achari47@hotmail.com', '-1b0766c8', 'Aslesha', 'Achari');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('provident', 'Abhirath22@hotmail.com', '604429f2', 'Abhirath', 'Trivedi');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('quasi', 'Goswamee.Ahuja@hotmail.com', '2827094', 'Goswamee', 'Ahuja');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('recusandae', 'Chandni_Dubashi@yahoo.co.in', '-211d6123', 'Chandni', 'Dubashi');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('adipisci', 'Daevi62@gmail.com', '1c4a418b', 'Daevi', 'Kaul');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('omnis', 'Girja.Banerjee@hotmail.com', '32b2dcd9', 'Girja', 'Banerjee');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('nulla', 'Annapurna_Mahajan@gmail.com', '77c91ed6', 'Annapurna', 'Mahajan');    
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('debitis', 'Himani_Bandopadhyay80@hotmail.com', '-4ed7a876', 'Himani', 'Bandopadhyay');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('vel', 'Anjali_Reddy@hotmail.com', '-4782af29', 'Anjali', 'Reddy');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('quae', 'Jagdeep_Varrier@yahoo.co.in', '6c52130e', 'Jagdeep', 'Varrier');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('voluptatum', 'Rukhmani36@hotmail.com', '-5e42a3dd', 'Rukhmani', 'Nayar-Tandon');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('fuga', 'Dipesh_Kapoor@gmail.com', '3d62b4b', 'Dipesh', 'Kapoor');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('error', 'Deependra93@gmail.com', '1210c6a8', 'Deependra', 'Kaniyar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('officiis', 'Malti_Kakkar@yahoo.co.in', '-52e962bc', 'Malti', 'Kakkar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('voluptatem', 'Padma4@yahoo.co.in', '6cd2f6c4', 'Padma', 'Dwivedi');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('rem', 'Harita_Devar@hotmail.com', '55c8f7bf', 'Harita', 'Devar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('alias', 'Somu.Dubashi@hotmail.com', '-5617849c', 'Somu', 'Dubashi');   
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('perferendis', 'Bhaanumati85@gmail.com', '-91ff2f9', 'Bhaanumati', 'Johar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('deleniti', 'Kamla.Mukhopadhyay40@hotmail.com', '64bf86aa', 'Kamla', 'Mukhopadhyay');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('praesentium', 'Bankimchandra49@hotmail.com', '623785ec', 'Bankimchandra', 'Joshi');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('beatae', 'Laxmi_Talwar@gmail.com', '77f91d5a', 'Laxmi', 'Talwar');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('quam', 'Vidhur_Khan@hotmail.com', '-10f7396f', 'Vidhur', 'Khan');  
+Insert Into Customer (custName, email, password, firstname, lastname) Values ('libero', 'Chandi43@gmail.com', '2ba7bf78', 'Chandi', 'Jain');  
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P001', 'Design 1', 'Creative design for a product', 'Art', 49.99, 100, 5, 'MKZOu'),
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P002', 'Design 2', 'Another amazing design', 'Fashion', 29.99, 150, 3, 'AqlOX');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P003', 'Artistic Creation', 'Abstract art masterpiece', 'Art', 79.99, 50, 2, 'sBOQd');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P004', 'Fashionable Apparel', 'Trendy clothing item', 'Fashion', 39.99, 120, 4, 'tmVxq');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P005', 'Digital Innovation', 'Cutting-edge digital product', 'Technology', 99.99, 80, 2, 'fLwqV');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P006', 'Vintage Charm', 'Classic and elegant design', 'Home Decor', 59.99, 90, 3, 'YaBPi');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P007', 'Eco-Friendly Item', 'Sustainable and eco-friendly product', 'Green Living', 69.99, 60, 2, 'EcBOS');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P008', 'Abstract Vision', 'Abstract design with a unique perspective', 'Art', 54.99, 110, 5, 'AUuyD');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P009', 'Tech Marvel', 'Innovative technology product', 'Technology', 89.99, 70, 2, 'Xfepz');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P010', 'Organic Living', 'Natural and organic lifestyle item', 'Green Living', 64.99, 100, 4, 'OVxDc');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P011', 'Zen Space', 'Calming and serene design', 'Home Decor', 44.99, 130, 3, 'cPZbP');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P012', 'Retro Vibes', 'Nostalgic and retro-inspired creation', 'Fashion', 34.99, 140, 5, 'zRhTW');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P013', 'Whimsical Wonderland', 'Playful and whimsical design', 'Art', 74.99, 80, 2, 'hbbzK');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P014', 'Fashion Fusion', 'Blend of fashion and technology', 'Fashion', 49.99, 90, 3, 'kSMVb');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P016', 'Urban Elegance', 'Chic and urban-inspired product', 'Home Decor', 39.99, 100, 5, 'JOrWa');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P017', 'Minimalist Delight', 'Simple and minimalist design', 'Art', 29.99, 110, 5, 'mmSnz');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P018', 'Creative Innovation', 'Innovative and creative masterpiece', 'Technology', 84.99, 60, 2, 'aNPmG');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P019', 'Artisan Craft', 'Handcrafted and artisanal creation', 'Fashion', 64.99, 70, 2, 'lrsAp');
+
+INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
+VALUES ('P020', 'Home Comfort', 'Comfortable and stylish home item', 'Home Decor', 74.99, 70, 2, 'athvf');
+
+-- For customer 'eum'
+INSERT INTO Likes (custName, productID) VALUES ('eum', 'P001');
+INSERT INTO Likes (custName, productID) VALUES ('eum', 'P003');
+INSERT INTO Likes (custName, productID) VALUES ('eum', 'P005');
+INSERT INTO Likes (custName, productID) VALUES ('eum', 'P019');
+
+-- For customer 'ullam'
+INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P014');
+INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P016');
+INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P018');
+INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P020');
+
+-- For customer 'atque'
+INSERT INTO Likes (custName, productID) VALUES ('atque', 'P001');
+INSERT INTO Likes (custName, productID) VALUES ('atque', 'P003');
+INSERT INTO Likes (custName, productID) VALUES ('atque', 'P005');
+INSERT INTO Likes (custName, productID) VALUES ('atque', 'P007');
+INSERT INTO Likes (custName, productID) VALUES ('atque', 'P009');
+
+-- For customer 'libero'
+INSERT INTO Likes (custName, productID) VALUES ('libero', 'P002');
+INSERT INTO Likes (custName, productID) VALUES ('libero', 'P004');
+INSERT INTO Likes (custName, productID) VALUES ('libero', 'P006');
+INSERT INTO Likes (custName, productID) VALUES ('libero', 'P020');
+
+
+--- Update likes in Portfolio
+UPDATE Portfolio p
+SET likes = (
+    SELECT COUNT(l.productID)
+    FROM Likes l
+    WHERE l.productID IN (
+        SELECT productID
+        FROM Product
+        WHERE portfolioID = p.portfolioID
+    )
+);
+
+INSERT INTO Cart (cartID, custName, totalPrice) VALUES
+('C01', 'eum', 0),
+('C02', 'ullam', 0),
+('C03', 'atque', 0),
+('C04', 'commodi', 0),
+('C05', 'id', 0),
+('C06', 'occaecati', 0),
+('C07', 'esse', 0),
+('C08', 'suscipit', 0),
+('C09', 'facere', 0),
+('C10', 'laudantium', 0),
+('C11', 'natus', 0),
+('C12', 'veniam', 0),
+('C13', 'quo', 0),
+('C14', 'placeat', 0),
+('C15', 'odit', 0),
+('C16', 'eveniet', 0),
+('C17', 'voluptates', 0),
+('C18', 'architecto', 0),
+('C19', 'numquam', 0),
+('C20', 'qui', 0),
+('C21', 'aut', 0),
+('C22', 'dolores', 0),
+('C23', 'quisquam', 0),
+('C24', 'nobis', 0),
+('C25', 'provident', 0),
+('C26', 'quasi', 0),
+('C27', 'recusandae', 0),
+('C28', 'adipisci', 0),
+('C29', 'omnis', 0),
+('C30', 'nulla', 0),
+('C32', 'debitis', 0),
+('C33', 'vel', 0),
+('C34', 'quae', 0),
+('C35', 'voluptatum', 0),
+('C36', 'fuga', 0),
+('C37', 'error', 0),
+('C38', 'officiis', 0),
+('C39', 'voluptatem', 0),
+('C41', 'rem', 0),
+('C42', 'alias', 0),
+('C44', 'perferendis', 0),
+('C45', 'deleniti', 0),
+('C47', 'praesentium', 0),
+('C48', 'beatae', 0),
+('C49', 'quam', 0),
+('C50', 'libero', 0);
+
+
+-- For Cart C01
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P001', 'C01', 49.99, 2, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P002', 'C01', 29.99, 1, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P003', 'C01', 79.99, 1, '2024-01-21');
+
+-- For Cart C02
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P004', 'C02', 39.99, 3, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P005', 'C02', 99.99, 1, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P006', 'C02', 59.99, 2, '2024-01-21');
+
+-- For Cart C03
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P007', 'C03', 69.99, 2, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P008', 'C03', 54.99, 1, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P009', 'C03', 89.99, 3, '2024-01-21');
+
+-- For Cart C04
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P010', 'C04', 64.99, 2, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P011', 'C04', 44.99, 1, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P012', 'C04', 34.99, 1, '2024-01-21');
+
+-- For Cart C05
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P013', 'C05', 74.99, 3, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P014', 'C05', 49.99, 1, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P016', 'C05', 39.99, 2, '2024-01-21');
+
+-- For Cart C06
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P017', 'C06', 29.99, 2, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P018', 'C06', 84.99, 1, '2024-01-21');
+INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P019', 'C06', 64.99, 3, '2024-01-21');
+
+
+--- Update the totalPrice in Cart
+UPDATE Cart
+SET totalPrice = (
+    SELECT SUM(ci.price * ci.quantity)
+    FROM CartItem ci
+    WHERE ci.cartID = Cart.cartID
+);
+
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A001', '1240', '81180 Agasti Drives', 'Sohna', 'Chandigarh', '639007');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A002', '8956', '24552 Ganesh Knoll', 'Nargund', 'Pondicherr', '323230');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A003', '815', '2548 Bhattathiri Fort', 'Mahuva', 'Kerala', '606280');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A004', '3567', '12345 Ujjawal Expressway', 'Singrauli', 'Jharkhand', '379572');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A005', '420', '300 Chandrakin Glens', 'Talcher', 'Himachal Pradesh', '793544');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A006', '73854', '20987 Chetanaanand Divide', 'Coimbatore', 'Andra Pradesh', '709757');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A007', '63426', '758 Manisha Terrace', 'Alappuzha', 'Meghalaya', '854223');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A008', '1831', '35237 Bhushit Knoll', 'Nilanga', 'Andaman and Nicobar Islands', '493606');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A009', '6561', '516 Nayar Mews', 'Gobichettipalayam', 'Nagaland', '374733');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A010', '1071', '3680 Bhattacharya Cliff', 'Nizamabad', 'Dadar and Nagar Haveli', '520340');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A011', '49513', '918 Aasha Mall', 'Mukerian', 'Gujarat', '854938');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A012', '147', '30310 Geeta Walk', 'Maharajpur', 'Maharashtra', '046471');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A013', '10067', '3491 Aatmaj Prairie', 'Ladwa', 'Daman and Diu', '678677');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A014', '183', '3596 Amritambu Ridges', 'Nowrozabad (Khodargama)', 'Maharashtra', '380982');  
+Insert Into Address (addressID, houseNo, street, city, state, pincode) Values ('A015', '30327', '71514 Chaturvedi Bypass', 'Vadakkuvalliyur', 'Mizoram', '679113'); 
+
+
+INSERT INTO Discount (discountID, discountCode, discountPercent, expirationDate)
+VALUES
+('D01', 'BIG10', 10, '2024-12-31'),
+('D02', 'OFFER15', 15, '2024-11-30'),
+('D03', 'SMALL20', 20, '2024-10-31'),
+('D04', 'GET25', 25, '2024-09-30'),
+('D05', 'FESTIVE30', 30, '2024-08-31'),
+('D06', 'LOOT35', 35, '2024-07-31'),
+('D07', 'ALL40', 40, '2024-06-30'),
+('D08', 'SPECIAL45', 45, '2024-05-31'),
+('D09', 'SALE50', 50, '2024-04-30'),
+('D10', 'LOOT55', 55, '2024-03-31');
+
+INSERT INTO `Order` (orderID, orderDate, delStatus, custName, addressID, cartID) VALUES ('O001', '2024-01-21', 'Preordered', 'eum', 'A001', 'C01');
+INSERT INTO `Order` (orderID, orderDate, delStatus, custName, addressID, cartID) VALUES ('O002', '2024-01-22', 'Processing', 'ullam', 'A002', 'C02');
+INSERT INTO `Order` (orderID, orderDate, delStatus, custName, addressID, cartID) VALUES ('O003', '2024-01-23', 'Shipped', 'atque', 'A003', 'C03');
+INSERT INTO `Order` (orderID, orderDate, delStatus, custName, addressID, cartID) VALUES ('O004', '2024-01-24', 'Preordered', 'commodi', 'A004', 'C04');
+INSERT INTO `Order` (orderID, orderDate, delStatus, custName, addressID, cartID) VALUES ('O005', '2024-01-25', 'Delivered', 'id', 'A005', 'C05');
+INSERT INTO `Order` (orderID, orderDate, delStatus, custName, addressID, cartID) VALUES ('O006', '2024-01-26', 'Shipped', 'occaecati', 'A006', 'C06');
+
+UPDATE `Order` SET discountID = 'D01' WHERE cartID = 'C01';
+UPDATE `Order` SET discountID = 'D02' WHERE cartID = 'C02';
+UPDATE `Order` SET discountID = 'D03' WHERE cartID = 'C03';
+UPDATE `Order` SET discountID = 'D04' WHERE cartID = 'C04';
+UPDATE `Order` SET discountID = 'D05' WHERE cartID = 'C05';
+UPDATE `Order` SET discountID = 'D06' WHERE cartID = 'C06';
+
+-- For Order 'O001'
+INSERT INTO Transaction (transactionID, discountID, custName, orderID)
+VALUES ('T001', 'D01', 'eum', 'O001');
+
+-- For Order 'O002'
+INSERT INTO Transaction (transactionID, discountID, custName, orderID)
+VALUES ('T002', 'D02', 'ullam', 'O002');
+
+-- For Order 'O003'
+INSERT INTO Transaction (transactionID, discountID, custName, orderID)
+VALUES ('T003', 'D03', 'atque', 'O003');
+
+-- For Order 'O004'
+INSERT INTO Transaction (transactionID, discountID, custName, orderID)
+VALUES ('T004', 'D04', 'commodi', 'O004');
+
+-- For Order 'O005'
+INSERT INTO Transaction (transactionID, discountID, custName, orderID)
+VALUES ('T005', 'D05', 'id', 'O005');
+
+-- For Order 'O006'
+INSERT INTO Transaction (transactionID, discountID, custName, orderID)
+VALUES ('T006', 'D06', 'occaecati', 'O006');
+
+
+-- Update transactionPrice in Transaction table
+UPDATE Transaction t
+SET transactionPrice = (
+    SELECT (c.totalPrice - (c.totalPrice * d.discountPercent / 100))
+    FROM Cart c
+    JOIN Discount d ON t.discountID = d.discountID
+    JOIN `Order` o ON t.orderID = o.orderID
+    WHERE o.cartID = c.cartID
+);

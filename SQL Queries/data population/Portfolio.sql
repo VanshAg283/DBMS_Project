@@ -29,4 +29,4 @@ SET likes = (
         FROM Product
         WHERE portfolioID = p.portfolioID
     )
-)
+);
