@@ -18,3 +18,15 @@ Insert Into Portfolio (portfolioID, desName) Values ('OVxDc','minima');
 Insert Into Portfolio (portfolioID, desName) Values ('AUuyD','impedit');  
 Insert Into Portfolio (portfolioID, desName) Values ('YaBPi','error');  
 Insert Into Portfolio (portfolioID, desName) Values ('sBOQd','cum');  
+
+--- Update likes in Portfolio
+UPDATE Portfolio p
+SET likes = (
+    SELECT COUNT(l.productID)
+    FROM Likes l
+    WHERE l.productID IN (
+        SELECT productID
+        FROM Product
+        WHERE portfolioID = p.portfolioID
+    )
+)

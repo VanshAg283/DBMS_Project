@@ -62,7 +62,7 @@ CREATE TABLE Customer(
 CREATE TABLE Cart(
     cartID varchar(10) NOT NULL,
     custName varchar(30) NOT NULL,
-    totalPrice float(2) NOT NULL,
+    totalPrice float(2) DEFAULT 0,
     PRIMARY KEY (cartID),
     FOREIGN KEY (custName)
     REFERENCES customer(custName)
@@ -73,9 +73,9 @@ CREATE TABLE Cart(
 CREATE TABLE Address(
     addressID varchar(10) NOT NULL,
     houseNo varchar(5) NOT NULL,
-    street varchar(5) NOT NULL,
-    city varchar(10) NOT NULL,
-    state varchar(10) NOT NULL,
+    street varchar(30) NOT NULL,
+    city varchar(30) NOT NULL,
+    state varchar(30) NOT NULL,
     pincode varchar(7) NOT NULL,
     PRIMARY KEY (addressID)
 );
@@ -86,9 +86,13 @@ CREATE TABLE `Order` (
     delStatus varchar(15) NOT NULL,
     custName varchar(30) NOT NULL,
     addressID varchar(10) NOT NULL,
+    cartID varchar(10) NOT NULL,
+    discountID varchar(10),
     PRIMARY KEY (orderID),
     FOREIGN KEY (custName) REFERENCES customer(custName),
-    FOREIGN KEY (addressID) REFERENCES Address(addressID)
+    FOREIGN KEY (addressID) REFERENCES Address(addressID),
+    FOREIGN KEY (cartID) REFERENCES Cart(cartID),
+    FOREIGN KEY (discountID) REFERENCES Discount(discountID)
 );
 
 CREATE TABLE Discount (

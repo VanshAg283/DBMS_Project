@@ -1,0 +1,60 @@
+INSERT INTO Cart (cartID, custName, totalPrice) VALUES
+('C01', 'eum', 0),
+('C02', 'ullam', 0),
+('C03', 'atque', 0),
+('C04', 'commodi', 0),
+('C05', 'id', 0),
+('C06', 'occaecati', 0),
+('C07', 'esse', 0),
+('C08', 'suscipit', 0),
+('C09', 'facere', 0),
+('C10', 'laudantium', 0),
+('C11', 'natus', 0),
+('C12', 'veniam', 0),
+('C13', 'quo', 0),
+('C14', 'placeat', 0),
+('C15', 'odit', 0),
+('C16', 'eveniet', 0),
+('C17', 'voluptates', 0),
+('C18', 'architecto', 0),
+('C19', 'numquam', 0),
+('C20', 'qui', 0),
+('C21', 'aut', 0),
+('C22', 'dolores', 0),
+('C23', 'quisquam', 0),
+('C24', 'nobis', 0),
+('C25', 'provident', 0),
+('C26', 'quasi', 0),
+('C27', 'recusandae', 0),
+('C28', 'adipisci', 0),
+('C29', 'omnis', 0),
+('C30', 'nulla', 0),
+('C31', 'aut', 0),
+('C32', 'debitis', 0),
+('C33', 'vel', 0),
+('C34', 'quae', 0),
+('C35', 'voluptatum', 0),
+('C36', 'fuga', 0),
+('C37', 'error', 0),
+('C38', 'officiis', 0),
+('C39', 'voluptatem', 0),
+('C40', 'odit', 0),
+('C41', 'rem', 0),
+('C42', 'alias', 0),
+('C43', 'dolores', 0),
+('C44', 'perferendis', 0),
+('C45', 'deleniti', 0),
+('C46', 'facere', 0),
+('C47', 'praesentium', 0),
+('C48', 'beatae', 0),
+('C49', 'quam', 0),
+('C50', 'libero', 0);
+
+
+--- Update the totalPrice in Cart
+UPDATE Cart
+SET totalPrice = (
+    SELECT SUM(ci.price * ci.quantity)
+    FROM CartItem ci
+    WHERE ci.cartID = Cart.cartID
+);
