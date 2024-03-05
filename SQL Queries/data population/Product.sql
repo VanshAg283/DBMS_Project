@@ -1,5 +1,5 @@
 INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
-VALUES ('P001', 'Design 1', 'Creative design for a product', 'Art', 49.99, 100, 5, 'MKZOu'),
+VALUES ('P001', 'Design 1', 'Creative design for a product', 'Art', 49.99, 100, 5, 'MKZOu');
 
 INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID)
 VALUES ('P002', 'Design 2', 'Another amazing design', 'Fashion', 29.99, 150, 3, 'AqlOX');
