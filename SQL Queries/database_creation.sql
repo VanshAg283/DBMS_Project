@@ -136,5 +136,5 @@ CREATE TABLE Likes (
   custName varchar(30) NOT NULL,
   productID varchar(10) NOT NULL,
   FOREIGN KEY (custName) references Customer(custName),
-  FOREIGN KEY (productID) references Product(productID)
+  FOREIGN KEY (productID) references Product(productID) ON DELETE CASCADE ON UPDATE CASCADE
 );
