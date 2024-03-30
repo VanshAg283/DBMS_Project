@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS DesInk;
 create database DesInk;
 use DesInk;
 
@@ -16,7 +17,6 @@ CREATE TABLE Designer (
 CREATE TABLE Portfolio(
     portfolioID varchar(10) NOT NULL,
     likes bigint unsigned NOT NULL DEFAULT 0,
-    preOrders int unsigned NOT NULL DEFAULT 0,
     desName varchar(30),
     PRIMARY KEY (portfolioID),
     FOREIGN KEY (desName)
@@ -80,6 +80,14 @@ CREATE TABLE Address(
     PRIMARY KEY (addressID)
 );
 
+CREATE TABLE Discount (
+  discountID varchar(10) NOT NULL,
+  discountCode varchar(10) NOT NULL,
+  discountPercent int NOT NULL,
+  expirationDate date,
+  PRIMARY KEY (discountID)
+);
+
 CREATE TABLE `Order` (
     orderID varchar(10) NOT NULL,
     orderDate date NOT NULL,
@@ -95,14 +103,6 @@ CREATE TABLE `Order` (
     FOREIGN KEY (discountID) REFERENCES Discount(discountID)
 );
 
-CREATE TABLE Discount (
-  discountID varchar(10) NOT NULL,
-  discountCode varchar(10) NOT NULL,
-  discountPercent int NOT NULL,
-  expirationDate date,
-  PRIMARY KEY (discountID)
-);
-
 CREATE TABLE CartItem (
     cartItemID varchar(10) NOT NULL,
     cartID varchar(10) NOT NULL,
@@ -110,6 +110,7 @@ CREATE TABLE CartItem (
     quantity int NOT NULL,
     dateAdded date NOT NULL,
     PRIMARY KEY (cartItemID,cartID),
+    FOREIGN KEY (cartItemID) references Product(productID),
     FOREIGN KEY (cartID) references Cart(cartID)
 );
 
