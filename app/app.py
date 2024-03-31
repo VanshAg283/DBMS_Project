@@ -9,7 +9,7 @@ app.secret_key = 'your_secret_key'  # Set a secret key for session management
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="V@nshu04",
+    password="root",
     database="DesInk"
 )
 cursor = conn.cursor()
@@ -285,7 +285,7 @@ def place_order():
 # Route to render the admin HTML page
 @app.route('/admin')
 def admin():
-    try:
+    if 'authenticated' in session and session['authenticated']:
         # Fetch data for each table separately
         cursor.execute("SELECT * FROM Product") 
         product_data = cursor.fetchall()
@@ -297,9 +297,23 @@ def admin():
         customer_data = cursor.fetchall()
 
         return render_template('admin.html', product_data=product_data, designer_data=designer_data, customer_data=customer_data)
-    except Exception as e:
-        print("Error:", e)
-        return "An error occurred while fetching data."
+    else:
+        return redirect('/')
+
+# Predefined valid credentials
+valid_credentials = {'username': 'root', 'password': 'root'}
+# Route to render the login page
+@app.route('/admin/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == valid_credentials['username'] and password == valid_credentials['password']:
+            session['authenticated'] = True
+            return redirect('/admin')
+        else:
+            return render_template('adminLogin.html', error=True)
+    return render_template('adminLogin.html', error=False)
 
 
 if __name__ == '__main__':
