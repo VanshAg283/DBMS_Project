@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, flash  
 import mysql.connector
+import re
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -77,55 +78,78 @@ def customer_signup():
         last_name = request.form['last_name']
         custName = request.form['custName']
 
-        # Insert customer data into the database
         try:
-            cursor.execute("INSERT INTO Customer (custName,email, password, firstName, lastName) VALUES (%s,%s, %s, %s, %s)",
-                           (custName,email, password, first_name, last_name))
-            conn.commit()
-            return redirect('/customer/login')  # Redirect to login page after successful signup
+            # Query the last cartID in the Cart table
+            cursor.execute("SELECT cartID FROM Cart ORDER BY cartID DESC LIMIT 1")
+            last_cart_id = cursor.fetchone()
+
+            # Extract the numeric part from the last cartID and increment it
+            if last_cart_id:
+                last_cart_id_number = int(re.search(r'\d+', last_cart_id[0]).group())
+                new_cart_id_number = last_cart_id_number + 1
+                new_cart_id = f'C{new_cart_id_number:02d}'  # Format the new cartID
+
+                # Insert customer data into the database
+                cursor.execute("INSERT INTO Customer (custName, email, password, firstName, lastName) VALUES (%s, %s, %s, %s, %s)",
+                               (custName, email, password, first_name, last_name))
+
+                # Insert a new row into the Cart table with the generated cartID and customer's name
+                cursor.execute("INSERT INTO Cart (cartID, custName) VALUES (%s, %s)", (new_cart_id, custName))
+
+                conn.commit()
+                return redirect('/customer/login')  # Redirect to login page after successful signup
+            else:
+                # No existing cartID found, handle this case
+                print("Error: Unable to generate a new cart ID.")
+                return render_template('error.html', message="Failed to sign up. Please try again.")
+
         except mysql.connector.Error as e:
+            # Handle duplicate entry error
+            if e.errno == 1062 :
+                return render_template('customer_signup.html', message="An account with the same username already exists.")
+            elif e.errno == 1644:
+                return render_template('customer_signup.html', message="An account with the same email already exists.")
             print("Error:", e)
             return render_template('error.html', message="Failed to sign up. Please try again.")
 
     return render_template('customer_signup.html')
 
+# @app.route('/designer/signup', methods=['GET', 'POST'])
+# def designer_signup():
+#     if request.method == 'POST':
+#         email = request.form['email']
+#         password = request.form['password']
+#         first_name = request.form['first_name']
+#         last_name = request.form['last_name']
 
-@app.route('/designer/signup', methods=['GET', 'POST'])
-def designer_signup():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
+#         # Insert designer data into the database
+#         try:
+#             cursor.execute("INSERT INTO Designer (email, password, firstName, lastName) VALUES (%s, %s, %s, %s)",
+#                            (email, password, first_name, last_name))
+#             conn.commit()
+#             return redirect('/designer/login')  # Redirect to login page after successful signup
+#         except mysql.connector.Error as e:
+#             print("Error:", e)
+#             return render_template('error.html', message="Failed to sign up. Please try again.")
 
-        # Insert designer data into the database
-        try:
-            cursor.execute("INSERT INTO Designer (email, password, firstName, lastName) VALUES (%s, %s, %s, %s)",
-                           (email, password, first_name, last_name))
-            conn.commit()
-            return redirect('/designer/login')  # Redirect to login page after successful signup
-        except mysql.connector.Error as e:
-            print("Error:", e)
-            return render_template('error.html', message="Failed to sign up. Please try again.")
-
-    return render_template('designer_signup.html')
+#     return render_template('designer_signup.html')
 
 
-@app.route('/designer/login', methods=['GET', 'POST'])
-def designer_login():
-    if request.method == 'POST':
-        username_email = request.form['username_email']
-        password = request.form['password']
+# @app.route('/designer/login', methods=['GET', 'POST'])
+# def designer_login():
+#     if request.method == 'POST':
+#         username_email = request.form['username_email']
+#         password = request.form['password']
 
-        # Authenticate designer
-        user = authenticate_designer(username_email, password)
-        if user:
-            session['user_id'] = user[0]  # Set session variable with user ID
-            return redirect('/dashboard')  # Redirect to designer dashboard page
-        else:
-            return render_template('designer_login.html', message='Invalid username/email or password')
+#         # Authenticate designer
+#         user = authenticate_designer(username_email, password)
+#         if user:
+#             session['user_id'] = user[0]  # Set session variable with user ID
+#             return redirect('/dashboard')  # Redirect to designer dashboard page
+#         else:
+#             return render_template('designer_login.html', message='Invalid username/email or password')
 
-    return render_template('designer_login.html')
+#     return render_template('designer_login.html')
 
 
 from flask import flash, session
@@ -171,15 +195,7 @@ def order():
                 if available_units >= quantity:
                     # Calculate the total price
                     total_price = price * quantity
-
-                    # Create a new cart if it doesn't exist for the customer
-                    cursor.execute("SELECT cartID FROM Cart WHERE custName = %s", (customer_name,))
-                    cart_info = cursor.fetchone()
-                    if not cart_info:
-                        # If cart doesn't exist, create a new one and set total price to 0
-                        cursor.execute("INSERT INTO Cart (cartID, custName, totalPrice) VALUES (UUID(), %s, 0)", (customer_name,))
-                        conn.commit()
-
+                    
                     # Get the cart ID
                     cursor.execute("SELECT cartID FROM Cart WHERE custName = %s", (customer_name,))
                     cart_id = cursor.fetchone()[0]
@@ -214,6 +230,8 @@ def order():
     cart_value = cursor.fetchone()[0]
 
     return render_template('order.html', available_items=available_items, cart_items=cart_items, cart_value=cart_value)
+
+
 @app.route('/place_order', methods=['GET', 'POST'])
 def place_order():
     if 'user_id' not in session:
@@ -262,6 +280,7 @@ def place_order():
     cart_value = cursor.fetchone()[0]
 
     return render_template('place_order.html', cart_details=cart_details, cart_value=cart_value)
+
 
 # Route to render the admin HTML page
 @app.route('/admin')
