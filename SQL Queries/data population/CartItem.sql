@@ -2,6 +2,7 @@
 INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P001', 'C01', 49.99, 2, '2024-01-21');
 INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P002', 'C01', 29.99, 1, '2024-01-21');
 INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P003', 'C01', 79.99, 1, '2024-01-21');
+INSERT INTO cartitem (cartitemID, cartID, price, quantity, dateAdded) VALUES ('P004', 'C01', 39.99, 2, '2024-01-21');
 
 -- For Cart C02
 INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES ('P004', 'C02', 39.99, 3, '2024-01-21');

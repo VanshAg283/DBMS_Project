@@ -89,13 +89,13 @@ CREATE TABLE Discount (
 );
 
 CREATE TABLE `Order` (
-    orderID varchar(10) NOT NULL,
-    orderDate date NOT NULL,
-    delStatus varchar(15) NOT NULL,
-    custName varchar(30) NOT NULL,
-    addressID varchar(10) NOT NULL,
-    cartID varchar(10) NOT NULL,
-    discountID varchar(10),
+    orderID INT AUTO_INCREMENT,
+    orderDate DATE NOT NULL,
+    delStatus VARCHAR(15) NOT NULL,
+    custName VARCHAR(30) NOT NULL,
+    addressID VARCHAR(10) NOT NULL,
+    cartID VARCHAR(10) NOT NULL,
+    discountID VARCHAR(10),
     PRIMARY KEY (orderID),
     FOREIGN KEY (custName) REFERENCES customer(custName),
     FOREIGN KEY (addressID) REFERENCES Address(addressID),
@@ -115,15 +115,14 @@ CREATE TABLE CartItem (
 );
 
 CREATE TABLE Transaction (
-    transactionID varchar(10) NOT NULL,
+    transactionID INT AUTO_INCREMENT PRIMARY KEY,
     discountID varchar(10) NOT NULL,
     custName varchar(30) NOT NULL,
-    orderID varchar(10) NOT NULL,
+    orderID INT NOT NULL,
     transactionPrice float(2),
-    PRIMARY KEY(transactionID),
-    FOREIGN KEY (discountID) references Discount(discountID),
-    FOREIGN KEY (custName) references Customer(custName),
-    FOREIGN KEY (orderID) references `Order`(orderID)
+    FOREIGN KEY (discountID) REFERENCES Discount(discountID),
+    FOREIGN KEY (custName) REFERENCES Customer(custName),
+    FOREIGN KEY (orderID) REFERENCES `Order`(orderID)
 );
 
 CREATE TABLE Includedin (

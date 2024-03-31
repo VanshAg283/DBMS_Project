@@ -9,7 +9,7 @@ app.secret_key = 'your_secret_key'  # Set a secret key for session management
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="V@nshu04",
     database="DesInk"
 )
 cursor = conn.cursor()
@@ -175,6 +175,9 @@ def order():
                 cursor.execute("SELECT totalPrice FROM Cart WHERE custName = %s", (customer_name,))
                 cart_value = cursor.fetchone()[0]
 
+                cursor.execute("INSERT INTO `Order` (orderDate, delStatus, custName, addressID, cartID) VALUES (NOW(), 'Processing', %s, 'A001', %s)", (customer_name, cart_info[0]))
+                conn.commit()
+
                 return render_template('place_order.html', cart_details=cart_details, cart_value=cart_value)
             else:
                 flash("Your cart is empty. Please add items before placing an order.", 'danger')
@@ -185,12 +188,12 @@ def order():
             quantity = int(request.form['quantity'])
 
             # Check if the product exists and has enough available units
-            cursor.execute("SELECT price, availableUnits, portfolioID FROM Product WHERE productID = %s", (product_id,))
+            cursor.execute("SELECT price, availableUnits, maxUnitsCap FROM Product WHERE productID = %s", (product_id,))
             product_info = cursor.fetchone()
             if product_info:
                 price = product_info[0]
                 available_units = product_info[1]
-                portfolio_id = product_info[2]
+                max_unitsCap = product_info[2]
 
                 if available_units >= quantity:
                     # Calculate the total price
@@ -204,12 +207,10 @@ def order():
                     cursor.execute("INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES (%s, %s, %s, %s, NOW())", (product_id, cart_id, price, quantity))
                     conn.commit()
 
-                    # Update the total price in the cart
-                    cursor.execute("UPDATE Cart SET totalPrice = totalPrice + %s WHERE cartID = %s", (total_price, cart_id))
-                    conn.commit()
-
                     # Display success message
                     flash("Product added to cart successfully.", 'success')
+                elif max_unitsCap < quantity:
+                    flash("Exceeded the maximum units cap for the product.", 'danger')
                 else:
                     flash("Insufficient available units for the product.", 'danger')
             else:
@@ -249,10 +250,11 @@ def place_order():
             discount_code = request.form.get('discount_code')
             if discount_code:
                 # Verify if the discount code exists and is valid
-                cursor.execute("SELECT discountPercent FROM Discount WHERE discountCode = %s AND expirationDate >= CURDATE()", (discount_code,))
+                cursor.execute("SELECT discountPercent, discountID FROM Discount WHERE discountCode = %s AND expirationDate >= CURDATE()", (discount_code,))
                 discount_info = cursor.fetchone()
                 if discount_info:
                     discount_percent = discount_info[0]
+                    discountID = discount_info[1]
                     # Apply the discount to the total price
                     cursor.execute("SELECT totalPrice FROM Cart WHERE custName = %s", (customer_name,))
                     total_price = cursor.fetchone()[0]
@@ -262,8 +264,32 @@ def place_order():
                     cursor.execute("UPDATE `Order` SET discountID = (SELECT discountID FROM Discount WHERE discountCode = %s) WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (discount_code, customer_name))
                     conn.commit()
 
+                    cursor.execute("SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
+                    order_id = cursor.fetchone()[0]
+
+                    cursor.execute("INSERT INTO transaction (discountID, custName, orderID) VALUES (%s, %s, (SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)))", (discountID, customer_name, customer_name))
+                    conn.commit()
+
+                    update_query = """
+                    UPDATE Transaction t
+                    SET transactionPrice = (
+                        SELECT (c.totalPrice - (c.totalPrice * d.discountPercent / 100))
+                        FROM Cart c
+                        JOIN Discount d ON t.discountID = d.discountID
+                        JOIN `Order` o ON t.orderID = o.orderID
+                        WHERE o.cartID = c.cartID
+                    ) """
+                    cursor.execute(update_query)
+                    conn.commit()
+
+                    cursor.execute("DELETE FROM CartItem WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
+                    conn.commit()
+
+                    cursor.execute("UPDATE Cart SET totalPrice = %s WHERE custName = %s", (0, customer_name))
+                    conn.commit()
+
                     flash(f"Order placed successfully with {discount_percent}% discount applied. Total price: ${discounted_price:.2f}", 'success')
-                    return redirect('/')
+                    return render_template('order_success.html', message=f"Order placed successfully with {discount_percent}% discount applied. Total price: ${discounted_price:.2f}")
                 else:
                     flash("Invalid or expired discount code. Order placement failed.", 'danger')
                     return redirect('/place_order')
