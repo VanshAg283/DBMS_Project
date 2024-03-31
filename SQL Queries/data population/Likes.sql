@@ -8,7 +8,6 @@ INSERT INTO Likes (custName, productID) VALUES ('eum', 'P019');
 INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P014');
 INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P016');
 INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P018');
-INSERT INTO Likes (custName, productID) VALUES ('ullam', 'P020');
 
 -- For customer 'atque'
 INSERT INTO Likes (custName, productID) VALUES ('atque', 'P001');
@@ -21,4 +20,3 @@ INSERT INTO Likes (custName, productID) VALUES ('atque', 'P009');
 INSERT INTO Likes (custName, productID) VALUES ('libero', 'P002');
 INSERT INTO Likes (custName, productID) VALUES ('libero', 'P004');
 INSERT INTO Likes (custName, productID) VALUES ('libero', 'P006');
-INSERT INTO Likes (custName, productID) VALUES ('libero', 'P020');

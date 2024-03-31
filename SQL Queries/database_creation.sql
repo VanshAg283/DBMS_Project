@@ -139,3 +139,14 @@ CREATE TABLE Likes (
   FOREIGN KEY (custName) references Customer(custName),
   FOREIGN KEY (productID) references Product(productID) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE LoginAttempts (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     customer_id varchar(30) NOT NULL,
+     login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY (customer_id) REFERENCES Customer(custName)
+);
+
+ALTER TABLE Customer
+ADD COLUMN login_attempts INT DEFAULT 0,
+ADD COLUMN blocked BOOLEAN DEFAULT FALSE;

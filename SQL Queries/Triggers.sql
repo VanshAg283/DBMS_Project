@@ -101,8 +101,51 @@ END;
 DELIMITER ;
 
 
+-- 6. Trigger to Update Login Attempts and Block Customer
+DELIMITER //
+
+CREATE TRIGGER update_login_attempts
+AFTER INSERT ON LoginAttempts
+FOR EACH ROW
+BEGIN
+    UPDATE Customer
+    SET login_attempts = login_attempts + 1
+    WHERE custName = NEW.customer_id;
+    
+    -- Check if the login attempts exceed the threshold
+    IF (SELECT login_attempts FROM Customer WHERE custName = NEW.customer_id) >= 3 THEN
+        -- Update the blocked status to true
+        UPDATE Customer
+        SET blocked = TRUE
+        WHERE custName = NEW.customer_id;
+    END IF;
+END;
+//
+
+DELIMITER ;
 
 
+-- 7. Trigger to Update Login Attempts on Successful Login
+DELIMITER //
+
+CREATE TRIGGER reset_login_attempts
+AFTER DELETE ON LoginAttempts
+FOR EACH ROW
+BEGIN
+    DECLARE customer_id VARCHAR(30);
+    
+    -- Get the customer_id of the deleted row
+    SET customer_id = OLD.customer_id;
+    
+    -- Reset login_attempts to 0 and set blocked to false for the corresponding customer
+    UPDATE Customer
+    SET login_attempts = 0,
+        blocked = FALSE
+    WHERE custName = customer_id;
+END;
+//
+
+DELIMITER ;
 
 
 

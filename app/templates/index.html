@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesInk: Crowd Sourced Design Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <center><div><img style="width: 21rem;" src="../static/images/Designer.png" alt="logo"></div></center>
+    <div class="container">
+        <h1>Welcome to DesInk</h1>
+        <p>Crowd Sourced Design Store</p>
+        
+        <h2>Login</h2>
+        <ul>
+            <li><a href="/customer/login">Login as Customer</a></li>
+            <li><a href="/designer/login">Login as Designer</a></li>
+        </ul>
+
+        <h2>Signup</h2>
+        <ul>
+            <li><a href="/customer/signup">Signup as Customer</a></li>
+            <li><a href="/designer/signup">Signup as Designer</a></li>
+        </ul>
+
+        <h3>Admin</h3>
+        <ul>
+            <li><a href="/admin">Admin</a></li>
+        </ul>
+    </div>
+</body>
+</html>
