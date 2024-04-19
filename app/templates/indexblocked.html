@@ -4,24 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DesInk: Crowd Sourced Design Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            font-family: "Nunito", sans-serif;
+            background-color: #fefefb;
             margin: 0;
             padding: 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            max-width: 800px;
-            margin: 50px auto;
+            display: flex;
+            width: 100%;
+            background-color: #f3e9dd; /* Left column background color */
+            color: black; /* Text color for left column */
+            height:100vh
+        }
+        .left-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            border-right: 1px solid #ccc; /* Vertical divider */
+            height: 100vh; /* Full height */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds viewport height */
+        }
+        .right-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Allows absolute positioning */
+            overflow: hidden; /* Prevents content overflow */
+            background-color: #fefefb; /* Right column background color */
+            color: #333; /* Text color for right column */
+            height: 100vh; /* Full height */
         }
         h1 {
-            color: #333;
+            /* Increase font size */
+            font-size: 4rem;
+            /* change font style */
+            font-family: 'DM Serif Display', Serif;
+            color: black;
+            margin: 0 0 20px;           
+            text-align: center;
+        }
+        h3 {
+            /* Increase font size */
+            font-size: 2rem;
+            /* change font style */
+            font-family: 'DM Serif Display', Serif;
+            color: black;
+            margin: 0 0 20px;           
+            text-align: center;
         }
         p {
             color: #666;
@@ -33,21 +75,54 @@
             border-radius: 5px;
             margin-bottom: 10px;
         }
+        .animation-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
-    <center><div><img style="width: 21rem;" src="../static/images/Designer.png" alt="logo"></div></center>
     <div class="container">
-        <h1>Welcome to DesInk</h1>
-        <p>Crowd Sourced Design Store</p>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="flash-message">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        <div class="left-column">
+            <div><img style="width: 21rem;" src="../static/images/DesInk.png" alt="logo"></div>
+            <h1>Welcome to DesInk</h1>
+            <h3>Crowd Sourced Design Store</h3>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="right-column">
+            <div class="animation-container">
+                <!-- JSON animations go here -->
+                <div class="animation" id="animation1"></div>
+            </div>
+        </div>
     </div>
+
+    <!-- Include JavaScript to load JSON animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
+    <script>
+        // Load JSON animation
+        var animation1 = bodymovin.loadAnimation({
+            container: document.getElementById('animation1'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: "../static/images/delivery-service.json" // Replace with your animation file path
+        });
+    </script>
+    
 </body>
 </html>
 

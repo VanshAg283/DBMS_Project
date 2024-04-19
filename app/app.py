@@ -53,15 +53,14 @@ def customer_login():
             if user[-1]:
                 flash("Your account has been blocked due to multiple login failures. Please contact support.", 'danger')
                 return render_template('indexblocked.html')
-            print(user)
             cursor.execute("INSERT INTO LoginAttempts (customer_id) VALUES (%s)", (user[0],))
             conn.commit()
             if user[2] == password:   # If the entered password matches the stored hash
                 session['user_id'] = user[0]  # Set session variable with user ID
                 cursor.execute("DELETE FROM LoginAttempts WHERE customer_id = %s", (user[0],))
                 conn.commit()
-                print(user)
-                return redirect('/order')  # Redirect to order page
+                
+                return redirect('/product')  # Redirect to order page
             else:
                 return render_template('customer_login.html', message='Invalid password')
         else:
@@ -151,8 +150,57 @@ def customer_signup():
 
 #     return render_template('designer_login.html')
 
+@app.route('/product', methods=['GET', 'POST'])
+def product():
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    customer_name = session['user_id']
 
-from flask import flash, session
+    if request.method == 'POST':
+        for key, value in request.form.items():
+            print(key, value, type(value))
+            if int(value) > 0:
+                # Add item to cart
+                product_id = key
+                quantity = int(value)
+                print(product_id, quantity)
+
+                # Check if the product exists and has enough available units
+                cursor.execute("SELECT price, availableUnits, maxUnitsCap FROM Product WHERE productID = %s", (product_id,))
+                product_info = cursor.fetchone()
+                if product_info:
+                    price = product_info[0]
+                    available_units = product_info[1]
+
+                    if available_units >= quantity:
+                        # Calculate the total price
+                        total_price = price * quantity
+
+                        # Get the cart ID
+                        cursor.execute("SELECT cartID FROM Cart WHERE custName = %s", (customer_name,))
+                        cart_id = cursor.fetchone()[0]
+
+                        # Insert the item into the cart
+                        cursor.execute("INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES (%s, %s, %s, %s, NOW())", (product_id, cart_id, price, quantity))
+                        conn.commit()
+
+                        # Display success message
+                        flash("Product added to cart successfully.", 'success')
+
+                    else:
+                        flash("Insufficient available units for the product.", 'danger')
+                else:
+                    flash("Product not found.", 'danger')
+        
+        return redirect('/order')
+
+
+    cursor.execute("SELECT * from Product where availableUnits > maxUnitsCap")
+    available_items = cursor.fetchall()
+
+    return render_template('product.html', available_items=available_items)
+
 
 @app.route('/order', methods=['GET', 'POST'])
 def order():
@@ -174,6 +222,9 @@ def order():
                 # Get total cart value
                 cursor.execute("SELECT totalPrice FROM Cart WHERE custName = %s", (customer_name,))
                 cart_value = cursor.fetchone()[0]
+
+                # Check if same order details already in order table
+                
 
                 cursor.execute("INSERT INTO `Order` (orderDate, delStatus, custName, addressID, cartID) VALUES (NOW(), 'Processing', %s, 'A001', %s)", (customer_name, cart_info[0]))
                 conn.commit()
@@ -219,7 +270,7 @@ def order():
             return redirect('/order')
 
     # Get available items for ordering
-    cursor.execute("SELECT productID, title, price, availableUnits FROM Product WHERE availableUnits > 0")
+    cursor.execute("SELECT productID, title, price, availableUnits, maxUnitsCap FROM Product WHERE availableUnits > 0")
     available_items = cursor.fetchall()
 
     # Get items in user's cart

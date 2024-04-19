@@ -4,31 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DesInk: Crowd Sourced Design Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            font-family: "Nunito", sans-serif;
+            background-color: #fefefb;
             margin: 0;
             padding: 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            max-width: 800px;
-            margin: 50px auto;
+            display: flex;
+            width: 100%;
+            background-color: #f3e9dd; /* Left column background color */
+            color: black; /* Text color for left column */
+            height:100vh
+        }
+        .left-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            border-right: 1px solid #ccc; /* Vertical divider */
+            height: 100vh; /* Full height */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds viewport height */
+        }
+        .right-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Allows absolute positioning */
+            overflow: hidden; /* Prevents content overflow */
+            background-color: #fefefb; /* Right column background color */
+            color: #333; /* Text color for right column */
+            height: 100vh; /* Full height */
         }
         h1 {
-            color: #333;
+            /* Increase font size */
+            font-size: 4rem;
+            /* change font style */
+            font-family: 'DM Serif Display', Serif;
+            color: black;
+            margin: 0 0 20px;           
+            text-align: center;
+        }
+        h3 {
+            /* Increase font size */
+            font-size: 2rem;
+            /* change font style */
+            font-family: 'DM Serif Display', Serif;
+            color: black;
+            margin: 0 0 20px;           
+            text-align: center;
+        }
+        h2 {
+            font-size: 2rem;
+            margin: 0 0 20px;
         }
         p {
-            color: #666;
+            margin-bottom: 30px;
         }
         ul {
             list-style-type: none;
             padding: 0;
+            margin-bottom: 30px;
+            text-align: center;
         }
         ul li {
             margin-bottom: 10px;
@@ -36,33 +84,60 @@
         a {
             text-decoration: none;
             color: #fff;
-            background-color: #007bff;
+            background-color: #8B4513; /* Button background color */
             padding: 10px 20px;
             border-radius: 5px;
             display: inline-block;
             transition: background-color 0.3s;
         }
         a:hover {
-            background-color: #0056b3;
+            background-color: #f3e9dd;
+            border: 2px solid #654321; 
+            color: #654321; 
+        }
+        .admin-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            background-color: #8B4513; /* Admin link background color */
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .admin-link:hover {
+            background-color: #fefefb; /* Admin link hover background color */
+        }
+        .animation-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
-<body>
-    <center><div><img style="width: 21rem;" src="../static/images/Designer.png" alt="logo"></div></center>
+<!-- <body>
+    <center><div><img style="width: 21rem;" src="../static/images/Designer.png" alt="logo"></div>
+    <h1>Welcome to DesInk</h1>
+    <h3 style="margin-top: -20px;">Crowd Sourced Design Store</h3></center>
+    <a class="admin-link" href="/admin/login">Admin</a>
     <div class="container">
-        <h1>Welcome to DesInk</h1>
-        <p>Crowd Sourced Design Store</p>
-        
         <h2>Login</h2>
         <ul>
             <li><a href="/customer/login">Login as Customer</a></li>
-            <!-- <li><a href="/designer/login">Login as Designer</a></li> -->
+            <li><a href="/designer/login">Login as Designer</a></li>
         </ul>
 
         <h2>Signup</h2>
         <ul>
             <li><a href="/customer/signup">Signup as Customer</a></li>
-            <!-- <li><a href="/designer/signup">Signup as Designer</a></li> -->
+            <li><a href="/designer/signup">Signup as Designer</a></li>
         </ul>
 
         <h3>Admin</h3>
@@ -70,5 +145,42 @@
             <li><a href="/admin/login">Admin</a></li>
         </ul>
     </div>
+</body> -->
+<body>
+    <div class="container">
+        <div class="left-column">
+            <div><img style="width: 21rem;" src="../static/images/DesInk.png" alt="logo"></div>
+            <h1>Welcome to DesInk</h1>
+            <h3>Crowd Sourced Design Store</h3>
+            <ul>
+                <h2>Login</h2>
+                <li><a href="/customer/login">Login as Customer</a></li>
+                <li><a href="/designer/login">Login as Designer</a></li>
+                <h2>Signup</h2>
+                <li><a href="/customer/signup">Signup as Customer</a></li>
+                <li><a href="/designer/signup">Signup as Designer</a></li>
+            </ul>
+        </div>
+        <div class="right-column">
+            <div class="animation-container">
+                <!-- JSON animations go here -->
+                <div class="animation" id="animation1"></div>
+            </div>
+        </div>
+    </div>
+    <a class="admin-link" href="/admin/login">Admin</a>
+
+    <!-- Include JavaScript to load JSON animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
+    <script>
+        // Load JSON animation
+        var animation1 = bodymovin.loadAnimation({
+            container: document.getElementById('animation1'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: "../static/images/delivery-service.json" // Replace with your animation file path
+        });
+    </script>
 </body>
 </html>
