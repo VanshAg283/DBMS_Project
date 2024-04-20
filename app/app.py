@@ -113,42 +113,63 @@ def customer_signup():
 
     return render_template('customer_signup.html')
 
-# @app.route('/designer/signup', methods=['GET', 'POST'])
-# def designer_signup():
-#     if request.method == 'POST':
-#         email = request.form['email']
-#         password = request.form['password']
-#         first_name = request.form['first_name']
-#         last_name = request.form['last_name']
+@app.route('/designer/signup', methods=['GET', 'POST'])
+def designer_signup():
+    if request.method == 'POST':
+        desName = request.form['desName']
+        email = request.form['email']
+        password = request.form['password']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        portfolioID = request.form['portfolioID']
+        error = 0
 
-#         # Insert designer data into the database
-#         try:
-#             cursor.execute("INSERT INTO Designer (email, password, firstName, lastName) VALUES (%s, %s, %s, %s)",
-#                            (email, password, first_name, last_name))
-#             conn.commit()
-#             return redirect('/designer/login')  # Redirect to login page after successful signup
-#         except mysql.connector.Error as e:
-#             print("Error:", e)
-#             return render_template('error.html', message="Failed to sign up. Please try again.")
+        # Insert designer data into the database
+        try:
+            cursor.execute("INSERT INTO Designer (desName, email, password, firstname, lastname) VALUES (%s, %s, %s, %s, %s)",
+                           (desName, email, password, first_name, last_name))
+            conn.commit()
+            error = 1
 
-#     return render_template('designer_signup.html')
+            cursor.execute("INSERT INTO Portfolio (portfolioID, desName) VALUES (%s, %s)", (portfolioID, desName))
+            conn.commit()
+            error = 2
+
+            cursor.execute("UPDATE Designer SET portfolioID = %s WHERE desName = %s", (portfolioID, desName))
+            conn.commit()
+
+            return redirect('/designer/login')  # Redirect to login page after successful signup
+        
+        except mysql.connector.Error as e:
+            print("Error:", e)
+            if error == 0:
+                return render_template('designer_signup.html', message="Email/Username already exists. Please try again.")
+            elif error == 1:
+                cursor.execute("DELETE FROM Designer WHERE desName = %s", (desName,))
+                conn.commit()
+                return render_template('designer_signup.html', message="Portfolio Name already exists. Please try again.")
+            else:
+                return render_template('designer_signup.html', message="Failed to sign up. Please try again.")      
+
+    return render_template('designer_signup.html')
 
 
-# @app.route('/designer/login', methods=['GET', 'POST'])
-# def designer_login():
-#     if request.method == 'POST':
-#         username_email = request.form['username_email']
-#         password = request.form['password']
+@app.route('/designer/login', methods=['GET', 'POST'])
+def designer_login():
+    if request.method == 'POST':
+        username_email = request.form['username_email']
+        password = request.form['password']
 
-#         # Authenticate designer
-#         user = authenticate_designer(username_email, password)
-#         if user:
-#             session['user_id'] = user[0]  # Set session variable with user ID
-#             return redirect('/dashboard')  # Redirect to designer dashboard page
-#         else:
-#             return render_template('designer_login.html', message='Invalid username/email or password')
+        # Authenticate designer
+        user = authenticate_designer(username_email, password)
+        if user:
+            session['user_id'] = user[0]  # Set session variable with user ID
+            return redirect('/dashboard')  # Redirect to designer dashboard page
+        else:
+            return render_template('designer_login.html', message='Invalid username/email or password')
 
-#     return render_template('designer_login.html')
+    return render_template('designer_login.html')
+
 
 @app.route('/product', methods=['GET', 'POST'])
 def product():
@@ -484,6 +505,70 @@ def login():
     return render_template('adminLogin.html', error=False)
 
 
+@app.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    desName = session['user_id']
+    cursor.execute("SELECT portfolioID FROM Portfolio WHERE desName = %s", (desName,))
+    portfolioID = cursor.fetchone()[0]
+    cursor.execute("SELECT * FROM Product WHERE portfolioID = %s", (portfolioID,))
+    products = cursor.fetchall()
+
+    if request.method == 'POST':
+        return redirect('/add_product')
+
+    return render_template('dashboard.html', products=products)
+
+
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_product():
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    desName = session['user_id']
+    cursor.execute("SELECT portfolioID FROM Portfolio WHERE desName = %s", (desName,))
+    portfolioID = cursor.fetchone()[0]
+
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        category = request.form['category']
+        price = request.form['price']
+        available_units = request.form['available_units']
+        max_units_cap = request.form['max_units']
+
+        # Add only if product is not already present in the portfolio
+        cursor.execute("SELECT * FROM Product WHERE title = %s AND portfolioID = %s", (title, portfolioID))
+        existing_product = cursor.fetchone()
+        if existing_product:
+            flash("Product already exists in your portfolio. Please add a new product.", 'warning')
+            return redirect('/dashboard')
+
+        # Query last productID in the Product table
+        cursor.execute("SELECT productID FROM Product ORDER BY productID DESC LIMIT 1")
+        last_product_id = cursor.fetchone()
+
+        # Extract the numeric part from the last productID and increment it
+        if last_product_id:
+            last_product_id_number = int(re.search(r'\d+', last_product_id[0]).group())
+            new_product_id_number = last_product_id_number + 1
+            new_product_id = f'P{new_product_id_number:03d}'
+        else:
+            new_product_id = 'P001'
+
+        cursor.execute("INSERT INTO Product (productID, title, content, category, price, availableUnits, maxUnitsCap, portfolioID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (new_product_id, title, description, category, price, available_units, max_units_cap, portfolioID))
+        conn.commit()
+
+        flash("Product added successfully.", 'success')
+        return redirect('/dashboard')
+
+    return render_template('add_product.html')
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+
 

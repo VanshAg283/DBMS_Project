@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" type="text/css" href="../static/order_address.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Product</h1>
+        
+        <form method="POST" action="/add_product">
+            <!-- Form to add a new address -->
+            <h2>Add New Product</h2>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required><br><br>
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required><br><br>
+            <label for="category">Category:</label>
+            <input type="text" id="category" name="category" required><br><br>
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" required><br><br>
+            <label for="available_units">Available Units:</label>
+            <input type="text" id="available_units" name="available_units" required><br><br>
+            <label for="max_units">Max Units Cap:</label>
+            <input type="text" id="max_units" name="max_units" required><br><br>
+            
+            <div class="button-container-add">
+                <input type="submit" name="add_product" value="Add Product">
+            </div>
+        </form>
+    </div>
+</body>
+</html>

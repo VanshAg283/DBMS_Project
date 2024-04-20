@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="../static/dashboard.css">
+</head>
+<body>
+    <div class = "container">
+        <h1>Dashboard</h1>
+    <form method="POST" action="/dashboard">
+        <div class="products-grid">
+            {% for item in products %}
+            <div class="product-item">
+                <div class="image-container">
+                    <img src="../static/images/placeholder-image.png" alt="Product Image">
+                </div>
+                <div class="description-container">
+                    <div class="name-description">
+                        <h2>{{ item[1] }}</h2>
+                        <p>{{ item[2] }}</p>
+                        <br />
+                        <p>Available Units: {{ item[5] }}</p>
+                        <p>Max Units Cap: {{ item[6] }}</p>
+                    </div>             
+                    <h3 class="price">${{ item[4] }}</h3>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="add_product">Add Product</button>
+
+    </div>
+    </form> 
+</body>

@@ -1,0 +1,98 @@
+/* Reset default browser styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap");
+
+body{
+    background-color: #fefefb;
+    font-family: 'Nunito', sans-serif;
+}
+
+.container {
+    font-family: 'Nunito', sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-family: 'DM Serif Display', Serif;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-gap: 20px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: background-color 0.3s ease;
+    background-color: #f3e9dd;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.image-container {
+    flex: 0 0 200px;
+    overflow: hidden;
+    height: 200px; 
+    margin-right: 20px;
+}
+
+.image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.description-container {
+    flex: 1;
+}
+
+.description-container h2 {
+    margin-bottom: 5px;
+}
+
+.description-container p {
+    margin-bottom: 5px;
+}
+
+.name-description {
+    position: absolute;
+    top: 25px; /* Adjust the distance from the top */
+    left: 225px; /* Adjust the distance from the left */
+}
+
+.price {
+    position: absolute;
+    bottom: 10px; /* Adjust the distance from the bottom */
+    right: 10px; /* Adjust the distance from the right */
+}
+
+.add_product {
+    font-family: 'DM Serif Display', Serif;
+    font-size: 24px;
+    padding: 5px 10px;
+    background-color: #8B4513;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+.add_product:hover {
+    background-color: #fefefb;
+    border: 2px solid #654321;
+    color: #654321;
+}
