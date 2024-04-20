@@ -1,0 +1,122 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap");
+
+body {
+    font-family: "Nunito", sans-serif;
+    background-color: #f3e9dd;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Align items vertically */
+    align-items: center; /* Center items horizontally */
+    color: black; /* Text color for left column */
+    height: 100vh;
+}
+
+
+h1 {
+    /* Increase font size */
+    font-size: 4rem;
+    /* change font style */
+    font-family: 'DM Serif Display', Serif;
+    color: black;
+    margin: 0 0 20px;           
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+input[type="submit"] {
+    font-family: 'Nunito', sans-serif;
+    padding: 10px 20px;
+    background-color: #8B4513;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+input[type="submit"]:hover {
+    background-color: #f3e9dd;
+    border: 1px solid #654321; 
+    color: #654321;
+}
+
+input[type=email],
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.button-container-add {
+    text-align: center;
+}
+
+.button-container-submit {
+    text-align: center;
+}
+
+.message.success {
+    position: fixed;
+    top: 20px;
+    left: 100px;
+    color: green;
+    font-weight: bold;
+}
+
+.message {
+    font-family: 'Nunito', sans-serif;
+    position: fixed;
+    top: 70px;
+    left: 670px;
+    color: white;
+    background-color: #dc3545;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}

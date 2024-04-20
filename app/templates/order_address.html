@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Address</title>
+    <link rel="stylesheet" type="text/css" href="../static/order_address.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Choose or Add Address</h1>
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        {% endif %}
+        <!-- Display existing addresses for the customer -->
+        <h2>Your Addresses</h2>
+        <form method="POST" action="/choose_address">
+            <ul>
+                {% for address in addresses %}
+                <li>
+                    <input type="radio" id="address{{ address[0] }}" name="selected_address" value="{{ address[0] }}">
+                    <label for="address{{ address[0] }}">{{ address[1] }}, {{ address[2] }}, {{ address[3] }}, {{ address[4] }} - {{ address[5] }}</label>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="button-container-submit">
+                <input type="submit" name="place_order" value="Select Address">
+            </div>
+            
+            <div class="button-container-add">
+                <input type="submit" name="add_address" value="Add Address">
+            </div>
+        </form>
+    </div>
+</body>
+</html>

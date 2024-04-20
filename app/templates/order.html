@@ -5,68 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Place Order</title>
     <link rel="stylesheet" type="text/css" href="../static/order.css">
-    <style>
-        .message.success {
-            color: green;
-            font-weight: bold;
-        }
-
-        .message.error {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Place Order</h1>
-        
-        <!-- Display available items for ordering -->
-        <h2>Available Items</h2>
-        <ul>
-            {% for item in available_items %}
-            <li>Product ID: {{ item[0] }} - Name: {{ item[1] }} - Price: {{ item[2] }} - Available Units: {{ item[3] }} - Max Units Cap: {{ item[4] }}</li>
-            {% endfor %}
-        </ul>
+        <div class="left-column">
+            <h1>Previous Orders </h1><br/>
+            <ul>
+                {% for order in existing_order %}
+                <li>Order ID: {{ order[0] }}</li>
+                <li>Order Date: {{ order[1] }}</li>
+                <li>Order Status: {{ order[2] }}</li>
+                <!-- Check if order is confirmed and add a cancel button then-->
+                {% if order[2] == 'Confirmed' %}
+                <form method="POST" action="/order">
+                    <input type="hidden" name="order_id" value="{{ order[0] }}">
+                    <input type="submit" value="Cancel Order" name="cancel_order">
+                </form>
+                {% endif %}
+                <hr />
+                <!-- Add space here  -->
+                <br/>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="right-column">
+            <h1>Place Order</h1>
+            <!-- Display items in the user's cart -->
+            <h2>Items in Cart</h2>
+            <ul>
+                {% for item in cart_items %}
+                <li>{{ item[2] }} - Quantity: {{ item[1] }}</li>
+                {% endfor %}
+            </ul>
 
-        <!-- Display items in the user's cart -->
-        <h2>Items in Cart</h2>
-        <ul>
-            {% for item in cart_items %}
-            <li>{{ item[0] }} - Quantity: {{ item[1] }}</li>
-            {% endfor %}
-        </ul>
-
-        <!-- Display the total value of the cart -->
-        <h2>Total Value of Cart</h2>
-        <p>
-            {% if cart_value %}
-                ${{ cart_value }}
-            {% else %}
-                $0
-            {% endif %}
-        </p>
-
-        <!-- Display the order confirmation message -->
-        {% if message %}
-        <p class="message {% if message_type == 'success' %}success{% else %}error{% endif %}">{{ message }}</p>
-        {% endif %}
-
-        <!-- Form for adding item to cart -->
-        <form method="POST" action="/order">
-            <label for="product_id">Product ID:</label>
-            <input type="text" id="product_id" name="product_id" required>
-            
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-            
-            <input type="submit" value="Add to Cart">
-        </form>
-
-        <!-- Form for placing an order -->
-        <form method="POST" action="/order">
-            <input type="submit" value="Place Order" name="place_order">
-        </form>
+            <!-- Display the total value of the cart -->
+            <h2>Total Value of Cart</h2>
+            <p>
+                {% if cart_value %}
+                    ${{ cart_value }}
+                {% else %}
+                    $0
+                {% endif %}
+            </p>
+            <!-- Form for placing an order -->
+            <form method="POST" action="/order">
+                <input type="submit" value="Place Order" name="place_order">
+            </form>
+        </div>
     </div>
 </body>
 </html>

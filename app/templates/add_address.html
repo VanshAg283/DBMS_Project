@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Address</title>
+    <link rel="stylesheet" type="text/css" href="../static/order_address.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Address</h1>
+        
+        <form method="POST" action="/add_address">
+            <!-- Form to add a new address -->
+            <h2>Add New Address</h2>
+            <label for="House_No">House No:</label>
+            <input type="text" id="House_No" name="House_No" required><br><br>
+            <label for="Street">Street:</label>
+            <input type="text" id="Street" name="Street" required><br><br>
+            <label for="City">City:</label>
+            <input type="text" id="City" name="City" required><br><br>
+            <label for="State">State:</label>
+            <input type="text" id="State" name="State" required><br><br>
+            <label for="zip_code">Zip Code:</label>
+            <input type="text" id="zip_code" name="zip_code" required><br><br>
+            
+            <div class="button-container-add">
+                <input type="submit" name="add_address" value="Add Address">
+            </div>
+        </form>
+    </div>
+</body>
+</html>

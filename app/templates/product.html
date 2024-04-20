@@ -9,7 +9,9 @@
 <body>
     <div class="container">
         <h1>Available Products</h1>
-        
+        {% if message %}
+        <p class="message">{{ message }}</p>
+        {% endif %}
         <!-- Display available items for ordering -->
         <form method="POST" action="/product">
             <div class="products-grid">

@@ -1,27 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap");
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: "Nunito", sans-serif;
+    background-color: #fefefb;
     margin: 0;
     padding: 0;
-}
-
-.container {
-    max-width: 800px;
-    margin: 20px auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h1, h2 {
     color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    display: flex;
+    width: 100%;
+    background-color: #f3e9dd; /* Left column background color */
+    color: black; /* Text color for left column */
+    height:100vh
+}
+.left-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #fefefb; /* Right column background color */
+    border-right: 1px solid #ccc; /* Vertical divider */
+    height: 100vh; /* Full height */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds viewport height */
+}
+.right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Allows absolute positioning */
+    overflow: hidden; /* Prevents content overflow */
+    color: #333; /* Text color for right column */
+    height: 100vh; /* Full height */
+}
+
+h1 {
+    /* Increase font size */
+    font-size: 4rem;
+    /* change font style */
+    font-family: 'DM Serif Display', Serif;
+    color: black;
+    margin: 0 0 20px;           
     text-align: center;
 }
 
+h2 {
+    font-size: 2rem;
+    margin: 0 0 0 5px;
+    /* reduce bottom margin */
+    margin-bottom: 2px;
+}
+
 ul {
-    list-style: none;
+    list-style-type: none;
     padding: 0;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 li {
@@ -30,30 +73,27 @@ li {
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
     font-weight: bold;
 }
 
-input[type="text"],
-input[type="number"],
 input[type="submit"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-input[type="submit"] {
-    background-color: #4caf50;
+    font-family: 'Nunito', sans-serif;
+    padding: 10px 20px;
+    background-color: #8B4513;
     color: #fff;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
     transition: background-color 0.3s ease;
+    margin-top: 20px;
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #f3e9dd;
+    border: 1px solid #654321; 
+    color: #654321;
 }
 
 .message {

@@ -157,14 +157,15 @@ def product():
     
     customer_name = session['user_id']
 
+    cursor.execute("SELECT * from Product where availableUnits > maxUnitsCap")
+    available_items = cursor.fetchall()
+
     if request.method == 'POST':
         for key, value in request.form.items():
-            print(key, value, type(value))
             if int(value) > 0:
                 # Add item to cart
                 product_id = key
                 quantity = int(value)
-                print(product_id, quantity)
 
                 # Check if the product exists and has enough available units
                 cursor.execute("SELECT price, availableUnits, maxUnitsCap FROM Product WHERE productID = %s", (product_id,))
@@ -172,6 +173,7 @@ def product():
                 if product_info:
                     price = product_info[0]
                     available_units = product_info[1]
+                    max_units_cap = product_info[2]
 
                     if available_units >= quantity:
                         # Calculate the total price
@@ -181,13 +183,26 @@ def product():
                         cursor.execute("SELECT cartID FROM Cart WHERE custName = %s", (customer_name,))
                         cart_id = cursor.fetchone()[0]
 
-                        # Insert the item into the cart
-                        cursor.execute("INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES (%s, %s, %s, %s, NOW())", (product_id, cart_id, price, quantity))
-                        conn.commit()
+                        # Check if product already exists in the cart
+                        cursor.execute("SELECT * FROM CartItem WHERE cartID = %s AND cartItemID = %s", (cart_id, product_id))
+                        existing_item = cursor.fetchone()
+                        if existing_item:
+                            # Update the quantity of the existing item only if maxUnitsCap is not exceeded
+                            if existing_item[3] + quantity > max_units_cap:
+                                message = "Exceeded the maximum units cap for the product."
+                                return render_template('product.html', message=message, available_items=available_items)
+                            cursor.execute("UPDATE CartItem SET quantity = quantity + %s WHERE cartID = %s AND cartItemID = %s", (quantity, cart_id, product_id))
+                            conn.commit()
 
+                            # Update the total price in the cart
+                            cursor.execute("UPDATE Cart SET totalPrice = totalPrice + %s WHERE cartID = %s", (total_price, cart_id))
+                            conn.commit()
+                        else:
+                            # Insert the item into the cart
+                            cursor.execute("INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES (%s, %s, %s, %s, NOW())", (product_id, cart_id, price, quantity))
+                            conn.commit()
                         # Display success message
                         flash("Product added to cart successfully.", 'success')
-
                     else:
                         flash("Insufficient available units for the product.", 'danger')
                 else:
@@ -195,9 +210,6 @@ def product():
         
         return redirect('/order')
 
-
-    cursor.execute("SELECT * from Product where availableUnits > maxUnitsCap")
-    available_items = cursor.fetchall()
 
     return render_template('product.html', available_items=available_items)
 
@@ -212,76 +224,127 @@ def order():
     if request.method == 'POST':
         if 'place_order' in request.form:
             # Place order if the user has items in the cart
-            cursor.execute("SELECT cartID FROM Cart WHERE custName = %s", (customer_name,))
+            cursor.execute("SELECT cartID, totalPrice FROM Cart WHERE custName = %s", (customer_name,))
             cart_info = cursor.fetchone()
-            if cart_info:
+            if cart_info[1] > 0:
                 # Fetch cart details for placing order
                 cursor.execute("SELECT ci.cartItemID, p.title, ci.quantity, ci.price FROM CartItem ci JOIN Product p ON ci.cartItemID = p.productID WHERE ci.cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
                 cart_details = cursor.fetchall()
 
-                # Get total cart value
-                cursor.execute("SELECT totalPrice FROM Cart WHERE custName = %s", (customer_name,))
-                cart_value = cursor.fetchone()[0]
-
-                # Check if same order details already in order table
                 
+                cart_value = cart_info[1]
 
-                cursor.execute("INSERT INTO `Order` (orderDate, delStatus, custName, addressID, cartID) VALUES (NOW(), 'Processing', %s, 'A001', %s)", (customer_name, cart_info[0]))
+                # Check if same order details already in order table and delstatus is processing
+                cursor.execute("SELECT * FROM `Order` WHERE cartID = %s AND delStatus = 'Processing'", (cart_info[0],))
+                existing_order = cursor.fetchone()
+                if existing_order:
+                    return redirect('/choose_address')  # If yes, go directly to address page
+
+                cursor.execute("INSERT INTO `Order` (orderDate, delStatus, custName, cartID) VALUES (NOW(), 'Processing', %s, %s)", (customer_name, cart_info[0]))
                 conn.commit()
 
-                return render_template('place_order.html', cart_details=cart_details, cart_value=cart_value)
+                return redirect('/choose_address')
             else:
                 flash("Your cart is empty. Please add items before placing an order.", 'danger')
                 return redirect('/order')
-        else:
-            # Add item to cart
-            product_id = request.form['product_id']
-            quantity = int(request.form['quantity'])
-
-            # Check if the product exists and has enough available units
-            cursor.execute("SELECT price, availableUnits, maxUnitsCap FROM Product WHERE productID = %s", (product_id,))
-            product_info = cursor.fetchone()
-            if product_info:
-                price = product_info[0]
-                available_units = product_info[1]
-                max_unitsCap = product_info[2]
-
-                if available_units >= quantity:
-                    # Calculate the total price
-                    total_price = price * quantity
-                    
-                    # Get the cart ID
-                    cursor.execute("SELECT cartID FROM Cart WHERE custName = %s", (customer_name,))
-                    cart_id = cursor.fetchone()[0]
-
-                    # Insert the item into the cart
-                    cursor.execute("INSERT INTO CartItem (cartItemID, cartID, price, quantity, dateAdded) VALUES (%s, %s, %s, %s, NOW())", (product_id, cart_id, price, quantity))
-                    conn.commit()
-
-                    # Display success message
-                    flash("Product added to cart successfully.", 'success')
-                elif max_unitsCap < quantity:
-                    flash("Exceeded the maximum units cap for the product.", 'danger')
-                else:
-                    flash("Insufficient available units for the product.", 'danger')
-            else:
-                flash("Product not found.", 'danger')
-
+        
+        elif 'cancel_order' in request.form:
+            cancelled_order_id = request.form.get('order_id')
+            cursor.execute("DELETE FROM Transaction WHERE orderID = %s", (cancelled_order_id,))
+            conn.commit()
+            cursor.execute("DELETE FROM `Order` WHERE orderID = %s", (cancelled_order_id,))
+            conn.commit()
             return redirect('/order')
-
-    # Get available items for ordering
-    cursor.execute("SELECT productID, title, price, availableUnits, maxUnitsCap FROM Product WHERE availableUnits > 0")
-    available_items = cursor.fetchall()
-
+        
     # Get items in user's cart
     cursor.execute("SELECT cartItemID, quantity FROM CartItem WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
     cart_items = cursor.fetchall()
-
+    # Get product name from cartItemID
+    for i in range(len(cart_items)):
+        cursor.execute("SELECT title FROM Product WHERE productID = %s", (cart_items[i][0],))
+        product_name = cursor.fetchone()
+        cart_items[i] = cart_items[i] + product_name
     # Get total cart value
     cursor.execute("SELECT totalPrice FROM Cart WHERE custName = %s", (customer_name,))
     cart_value = cursor.fetchone()[0]
 
-    return render_template('order.html', available_items=available_items, cart_items=cart_items, cart_value=cart_value)
+    # Check if there is an order not in processing state
+    cursor.execute("SELECT * FROM `Order`  WHERE custName = %s AND delStatus != 'Processing'", (customer_name,))
+    existing_order = cursor.fetchall()
+
+    return render_template('order.html', cart_items=cart_items, cart_value=cart_value, existing_order=existing_order)
+
+@app.route('/choose_address', methods=['GET', 'POST'])
+def order_address():
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    customer_name = session['user_id']
+
+    cursor.execute("SELECT * FROM Address WHERE custName = %s", (customer_name,))
+    addresses = cursor.fetchall()
+    message = None
+
+    if request.method == 'POST':
+        if 'add_address' in request.form:
+            return redirect('/add_address')
+        
+        elif 'place_order' in request.form:
+            selected_address_id = request.form.get('selected_address')
+            if selected_address_id:
+                # Store the selected address ID in the session or wherever needed
+                session['selected_address'] = selected_address_id
+
+                # Store the addressID in customer order
+                cursor.execute("SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s) AND delStatus = 'Processing'", (customer_name,))
+                order_id = cursor.fetchone()[0]
+                cursor.execute("UPDATE `Order` SET addressID = %s WHERE orderID = %s", (selected_address_id, order_id))  # Fetches the last inserted id of the order
+                conn.commit()
+                return redirect('/place_order')
+            else:
+                message = "Please select an address to proceed."
+    
+    return render_template('order_address.html', addresses=addresses, message=message)
+
+@app.route('/add_address', methods=['GET', 'POST'])
+def add_address():
+    if 'user_id' not in session:
+        return redirect('/')
+    
+    if request.method == 'POST':
+        houseNo = request.form['House_No']
+        street = request.form['Street']
+        city = request.form['City']
+        state = request.form['State']
+        zip_code = request.form['zip_code']
+
+        # Add only if address is not already present for this user
+        cursor.execute("SELECT * FROM Address WHERE houseNo = %s AND street = %s AND city = %s AND state = %s AND pincode = %s AND custName = %s", (houseNo, street, city, state, zip_code, session['user_id']))
+        existing_address = cursor.fetchone()
+        if existing_address:
+            flash("Address already exists. Please select it from the list.", 'warning')
+            return redirect('/choose_address')
+
+        # Query last addressID in the Address table
+        cursor.execute("SELECT addressID FROM Address ORDER BY addressID DESC LIMIT 1")
+        last_address_id = cursor.fetchone()
+
+        # Extract the numeric part from the last addressID and increment it
+        if last_address_id:
+            last_address_id_number = int(re.search(r'\d+', last_address_id[0]).group())
+            new_address_id_number = last_address_id_number + 1
+            new_address_id = f'A{new_address_id_number:03d}'
+        
+        customer_name = session['user_id']
+        cursor.execute("INSERT INTO Address (addressID, houseNo, street, city, state, pincode, custName) VALUES (%s, %s, %s, %s, %s, %s, %s)", (new_address_id, houseNo, street, city, state, zip_code, customer_name))
+        conn.commit()
+
+        flash("Address added successfully.", 'success')
+
+        return redirect('/choose_address')
+    
+
+    return render_template('add_address.html')
 
 
 @app.route('/place_order', methods=['GET', 'POST'])
@@ -311,14 +374,15 @@ def place_order():
                     total_price = cursor.fetchone()[0]
                     discounted_price = total_price * (1 - discount_percent / 100)
 
-                    # Update the order with the applied discount
-                    cursor.execute("UPDATE `Order` SET discountID = (SELECT discountID FROM Discount WHERE discountCode = %s) WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (discount_code, customer_name))
+                    # Update the order with the applied discount where delStatus is 'Processing'
+                    cursor.execute("UPDATE `Order` SET discountID = %s WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s) AND delStatus = 'Processing'", (discountID, customer_name))
                     conn.commit()
 
-                    cursor.execute("SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
+
+                    cursor.execute("SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s) AND delStatus = 'Processing'", (customer_name,))
                     order_id = cursor.fetchone()[0]
 
-                    cursor.execute("INSERT INTO transaction (discountID, custName, orderID) VALUES (%s, %s, (SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)))", (discountID, customer_name, customer_name))
+                    cursor.execute("INSERT INTO transaction (discountID, custName, orderID) VALUES (%s, %s, %s)", (discountID, customer_name, order_id))
                     conn.commit()
 
                     update_query = """
@@ -333,6 +397,10 @@ def place_order():
                     cursor.execute(update_query)
                     conn.commit()
 
+                    # Update delStatus to 'Confirmed'
+                    cursor.execute("UPDATE `Order` SET delStatus = 'Confirmed' WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s) AND delStatus = 'Processing'", (customer_name,))
+                    conn.commit()
+
                     cursor.execute("DELETE FROM CartItem WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
                     conn.commit()
 
@@ -345,8 +413,31 @@ def place_order():
                     flash("Invalid or expired discount code. Order placement failed.", 'danger')
                     return redirect('/place_order')
             else:
-                flash("Please provide a discount code to proceed with the order.", 'danger')
-                return redirect('/place_order')
+                # No need to apply discount
+                cursor.execute("SELECT totalPrice FROM Cart WHERE custName = %s", (customer_name,))
+                total_price = cursor.fetchone()[0]
+
+                cursor.execute("SELECT orderID FROM `Order` WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s) AND delStatus = 'Processing'", (customer_name,))
+                order_id = cursor.fetchone()[0]
+                
+
+                cursor.execute("INSERT INTO transaction (custName, orderID, transactionPrice) VALUES (%s, %s, %s)", (customer_name, order_id, total_price))
+                conn.commit()
+
+                # Update delStatus to 'Confirmed'
+                cursor.execute("UPDATE `Order` SET delStatus = 'Confirmed' WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s) AND delStatus = 'Processing'", (customer_name,))
+                conn.commit()
+
+                cursor.execute("DELETE FROM CartItem WHERE cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
+                conn.commit()
+
+                cursor.execute("UPDATE Cart SET totalPrice = %s WHERE custName = %s", (0, customer_name))
+                conn.commit()
+
+                flash(f"Order placed successfully. Total price: ${total_price:.2f}", 'success')
+                return render_template('order_success.html', message=f"Order placed successfully. Total price: ${total_price:.2f}")
+
+
 
     # Fetch cart details for placing order
     cursor.execute("SELECT ci.cartItemID, p.title, ci.quantity, ci.price FROM CartItem ci JOIN Product p ON ci.cartItemID = p.productID WHERE ci.cartID IN (SELECT cartID FROM Cart WHERE custName = %s)", (customer_name,))
