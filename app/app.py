@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, flash  
 import mysql.connector
 import re
+import subprocess
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
@@ -9,8 +10,8 @@ app.secret_key = 'your_secret_key'  # Set a secret key for session management
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="V@nshu04",
-    database="DesInk"
+    password="root",
+    database="desInk"
 )
 cursor = conn.cursor()
 # Function to authenticate user
@@ -471,23 +472,88 @@ def place_order():
     return render_template('place_order.html', cart_details=cart_details, cart_value=cart_value)
 
 
-# Route to render the admin HTML page
+
 @app.route('/admin')
 def admin():
     if 'authenticated' in session and session['authenticated']:
-        # Fetch data for each table separately
-        cursor.execute("SELECT * FROM Product") 
+        # Fetch data for each table
+        cursor.nextset()
+        cursor.execute("SELECT * FROM Product")
         product_data = cursor.fetchall()
-
         cursor.execute("SELECT * FROM Designer")
         designer_data = cursor.fetchall()
-
         cursor.execute("SELECT * FROM Customer")
         customer_data = cursor.fetchall()
 
-        return render_template('admin.html', product_data=product_data, designer_data=designer_data, customer_data=customer_data)
+        # Execute statistics queries
+        total_customers_query = "SELECT COUNT(*) AS total_customers FROM Customer"
+        total_designers_query = "SELECT COUNT(*) AS total_designers FROM Designer"
+        top_selling_products_query = """
+            SELECT p.productID, p.title, SUM(ci.quantity) AS total_sold
+            FROM Product p
+            JOIN CartItem ci ON p.productID = ci.cartItemID
+            GROUP BY p.productID, p.title
+            ORDER BY total_sold DESC
+            LIMIT 5
+        """
+        customer_order_history_query = """
+            SELECT custName, COUNT(*) AS total_orders
+            FROM `Order`
+            GROUP BY custName
+            ORDER BY total_orders DESC
+        """
+        popular_product_categories_query = """
+            SELECT category, SUM(availableUnits) AS total_units_sold
+            FROM Product
+            GROUP BY category
+            ORDER BY total_units_sold DESC
+        """
+        customer_lifetime_value_query = """
+            SELECT custName, SUM(totalPrice) 
+            AS total_spent
+            FROM Cart
+            GROUP BY custName
+            ORDER BY total_spent DESC
+            LIMIT 5;
+        """
+        top_performing_discount_codes_query = """
+            SELECT d.discountCode, COUNT(*) AS usage_count
+            FROM `Order` o
+            JOIN Discount d ON o.discountID = d.discountID
+            WHERE o.discountID IS NOT NULL
+            GROUP BY d.discountCode
+            ORDER BY usage_count DESC;
+        """
+        # Fetch statistics data
+        cursor.execute(total_customers_query)
+        total_customers = cursor.fetchall()
+        cursor.execute(total_designers_query)
+        total_designers = cursor.fetchall()
+        cursor.execute(top_selling_products_query)
+        top_selling_products = cursor.fetchall()
+        cursor.execute(customer_order_history_query)
+        customer_order_history = cursor.fetchall()
+        cursor.execute(popular_product_categories_query)
+        popular_product_categories = cursor.fetchall()
+        cursor.execute(customer_lifetime_value_query)
+        customer_lifetime_value = cursor.fetchall()
+        cursor.execute(top_performing_discount_codes_query)
+        top_performing_discount_codes = cursor.fetchall()
+
+        return render_template('admin.html', 
+                               product_data=product_data, 
+                               designer_data=designer_data, 
+                               customer_data=customer_data,
+                               total_customers=total_customers,
+                               total_designers=total_designers,
+                               top_selling_products=top_selling_products,
+                               customer_order_history=customer_order_history,
+                               popular_product_categories=popular_product_categories,
+                               customer_lifetime_value = customer_lifetime_value,
+                               top_performing_discount_codes = top_performing_discount_codes)
     else:
         return redirect('/')
+
 
 # Predefined valid credentials
 valid_credentials = {'username': 'root', 'password': 'root'}

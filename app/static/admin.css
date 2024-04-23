@@ -1,21 +1,24 @@
-/* style.css */
+/* admin.css */
 
 /* Body styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #e6e6e6;
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 
 /* Header styles */
 h1 {
     text-align: center;
     margin-top: 20px;
+    color: #191919;
 }
 
 h2 {
     margin-top: 40px;
+    color: #292929;
 }
 
 /* Table styles */
@@ -23,11 +26,15 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-    padding: 10px;
-    text-align: left;
+    padding: 12px;
+    text-align: center;
+    /* Set a fixed minimum width for table cells to ensure more symmetric column widths */
+    min-width: 120px; /* Adjust as needed based on your content */
 }
 
 th {
@@ -36,9 +43,50 @@ th {
 }
 
 tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #e5e5e5;
 }
 
 tr:hover {
     background-color: #ddd;
+}
+
+/* Responsive table */
+@media screen and (max-width: 600px) {
+    th, td {
+        width: auto; /* Allow cells to adjust width based on content on smaller screens */
+    }
+}
+
+.twoColumn {
+    width: 50%;
+}
+
+/* Progress bar styles */
+.progress-container {
+    border: #191919;
+    width: 50%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.progress-bar {
+    height: 30px;
+    background-color: #4CAF50;
+    width: 0%;
+    transition: width 2s ease-in-out;
+
+}
+
+.progressWhole {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.progressIn{
+    display: flex;
+    flex-direction: row;
 }

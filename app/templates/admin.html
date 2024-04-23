@@ -7,8 +7,115 @@
     <link rel="stylesheet" type="text/css" href="../static/admin.css">
 </head>
 <body>
-    <h1>Admin Panel - All Tables</h1>
-    
+    <h1>Welcome back, Admin!</h1>
+
+    <h2>DesInk Statistics</h2>
+    <h2>Our Journey so far !</h3>
+    <div class="progressWhole">
+        <div class="progress-container">
+            <p>Total Number of Customers:</p>
+            <div class="progress-bar" id="customerProgress"></div>
+            <div class="progressIn">
+                <p><span id="totalCustomers">{{ total_customers[0][0] }}</span></p>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <p>Total Number of Designers  </p>
+            <div class="progress-bar" id="designerProgress"></div>
+            <div class="progressIn">
+                <p><span id="totalDesigners">{{ total_designers[0][0] }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/admin.js"></script>
+    <h2>Customer Lifetime Value (CLV)</h2>
+    <table border="1" >
+        <tr >
+            <th class="twoColumn" >Customer ID</th>
+            <th class="twoColumn" >Total Amount Spent</th>
+        </tr>
+        {% for customer in customer_lifetime_value %}
+            <tr>
+                <td>{{ customer[0] }}</td>
+                <td>{{ customer[1] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2>Popular Product Categories</h2>
+    <table border="1">
+        <tr>
+            <th class="twoColumn">Product Category</th>
+            <th class="twoColumn">Total Units Sold</th>
+        </tr>
+        {% for product in popular_product_categories %}
+            <tr>
+                <td>{{ product[0] }}</td>
+                <td>{{ product[1] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2>Top Performing Discount Codes</h2>
+    <table border="1">
+        <tr>
+            <th class="twoColumn" >Discount ID</th>
+            <th class="twoColumn" >Times used</th>
+        </tr>
+        {% for discount in top_performing_discount_codes %}
+            <tr>
+                <td>{{ discount[0] }}</td>
+                <td>{{ discount[1] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+    <h2>Top Selling Products</h2>
+    <table border="1">
+        <tr>
+            <th>Product ID</th>
+            <th>Title</th>
+            <th>Total Sold</th>
+        </tr>
+        {% for product in top_selling_products %}
+            <tr>
+                <td>{{ product[0] }}</td>
+                <td>{{ product[1] }}</td>
+                <td>{{ product[2] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Customer Order History</h2>
+    <table border="1">
+        <tr>
+            <th class="twoColumn">Customer Name</th>
+            <th class="twoColumn">Total Orders</th>
+        </tr>
+        {% for order in customer_order_history %}
+            <tr>
+                <td>{{ order[0] }}</td>
+                <td>{{ order[1] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Popular Product Categories</h2>
+    <table border="1">
+        <tr>
+            <th class="twoColumn">Category</th>
+            <th class="twoColumn">Total Units Sold</th>
+        </tr>
+        {% for category in popular_product_categories %}
+            <tr>
+                <td>{{ category[0] }}</td>
+                <td>{{ category[1] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h1>All Tables</h1>
     <h2>Product Table</h2>
     <table border="1">
         <tr>
