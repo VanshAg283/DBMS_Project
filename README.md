@@ -1,7 +1,7 @@
-h2>About the Project</h2>
+<h2>About the Project</h2>
 <p>This project, titled DeskInk, is a crowd-sourced design store created by Aditya Sharma and Vansh Yadav. It aims to provide a platform for designers to showcase and sell their creations to a wide audience.</p>
 <p>This project, titled DeskInk, is a crowd-sourced design store created by Aditya Sharma and Vansh Aggarwal. It aims to provide a platform for designers to showcase and sell their creations to a wide audience.</p>
-## Tech Stack
+<h2>Tech Stack</h2>
 
 <div style="display: flex; justify-content: space-around; align-items: center; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);">
     <img src="https://github.com/VanshAg283/DBMS_Project/assets/123091289/c5cd522c-344c-4e35-b25d-22148d2ec22b" alt="sql-icon" style="width: 100px; height: 100px; object-fit: contain;">
