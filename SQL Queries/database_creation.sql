@@ -77,6 +77,7 @@ CREATE TABLE Address(
     city varchar(30) NOT NULL,
     state varchar(30) NOT NULL,
     pincode varchar(7) NOT NULL,
+    custName varchar(30) DEFAULT NULL,
     PRIMARY KEY (addressID)
 );
 
